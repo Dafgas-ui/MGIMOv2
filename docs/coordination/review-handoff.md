@@ -94,3 +94,16 @@ changed_files: docs/coordination/task-board.md, docs/coordination/review-handoff
 verified_checks: python tools/schema_validator.py --check-schemas -> PASS (3 schemas); python -m unittest discover -s tests/unit -v -> 26 tests OK; python tools/check_coordination.py -> PASS; verification of CORE-01 and CORE-02 closure; independent E2E CLI test in temp directory (init-case, upsert-node, analyze-csv T02/T03/T04, advance-stage gate, log-usage T09/T11, render-outputs ADR-005, status/resume T07, invalidate-source T08)
 limitations: Замечания CORE-01 и CORE-02 полностью закрыты и подтверждены тестами. Неблокирующее наблюдение CORE-03 (Low): при вызове invalidate-source или upsert-node поверх уже сгенерированных outputs/*.md необходимо повторно вызывать render-outputs, чтобы синхронизировать текст Markdown-витрины с обновлёнными JSON-реестрами (учесть в инструкциях навыков TASK-004/TASK-005)
 predecessor_ref: HANDOFF TASK-002 (b8dca7a)
+
+
+## [HANDOFF] TASK-003 — 2026-11-09 15:53
+task_id: TASK-003
+record_type: HANDOFF
+author: Sonnet-Staff
+timestamp: 2026-11-09 15:53
+commit_hash: d6f669c
+agents_md_sha256: 57bf75979bd8d3b17fef9c137c09f9b96bbf5504b8699080955c13da9c900b73
+changed_files: .agents/hooks.json, tools/session_recovery_hook.py, tools/check_coordination.py, tests/unit/test_session_recovery_hook.py, tests/unit/test_check_coordination.py, docs/coordination/task-board.md, docs/coordination/review-handoff.md
+verified_checks: python tools/check_coordination.py -> PASS; python -m unittest discover -s tests/unit -v -> 37 tests OK; hooks.json validation; session_recovery_hook runs from .agents/ and root; T07/T08/T09/T11 recovery contract verification
+limitations: Хук автовосстановления возвращает {} при отсутствии активных state.json в projects/; при наличии кейсов выдает контракт injectSteps.systemMessage; в tools/check_coordination.py закрыто замечание COORD-01 (валидация 10 полей и наличия AUDIT записи)
+predecessor_ref: AUDIT TASK-002 (4a4b187)
