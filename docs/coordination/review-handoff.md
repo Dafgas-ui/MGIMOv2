@@ -120,3 +120,15 @@ changed_files: docs/coordination/task-board.md, docs/coordination/review-handoff
 verified_checks: python -m unittest discover -s tests/unit -v -> 37 tests OK; python tools/check_coordination.py -> PASS; verification of COORD-01 closure (10 required fields + AUDIT record check); subprocess execution of python ../tools/session_recovery_hook.py from .agents/ with empty stdin, JSON stdin, and --test-case -> PASS
 limitations: Замечание COORD-01 полностью закрыто. Новых замечаний к .agents/hooks.json и tools/session_recovery_hook.py не выявлено (вывод хука строго изолирован от контура разработки и содержит только продуктовые метрики T07/T08/T09/T11)
 predecessor_ref: HANDOFF TASK-003 (d6f669c)
+
+## [HANDOFF] TASK-004 — 2026-11-09 16:44
+task_id: TASK-004
+record_type: HANDOFF
+author: Opus-Mind
+timestamp: 2026-11-09 16:44
+commit_hash: db0ffdc
+agents_md_sha256: 57bf75979bd8d3b17fef9c137c09f9b96bbf5504b8699080955c13da9c900b73
+changed_files: agent/runtime-instructions.md, knowledge/product-strategy/frameworks.md, knowledge/communication/messaging-guide.md, knowledge/research-methods/evidence-and-metrics.md, knowledge/evaluation/validation-and-guardrails.md, skills/problem-framing/SKILL.md, skills/source-and-data-analysis/SKILL.md, skills/options-and-strategy/SKILL.md, skills/evidence-audit-and-reassessment/SKILL.md, docs/coordination/task-board.md, docs/coordination/review-handoff.md
+verified_checks: python -m unittest discover -s tests/unit -v -> 37 tests OK; YAML frontmatter (name, description) in 4 SKILL.md -> OK; scan for dev-contour leaks (TASK-, coordination, role names) in agent/, knowledge/, skills/ -> none; CLI commands matched against strategist_cli.py --help and schemas/*.schema.json; python tools/check_coordination.py -> PASS
+limitations: CORE-03 закрыт на уровне регламента (обязательный render-outputs + log-usage в runtime-instructions и skills), не кодом; субагенты research-analyst, synthetic-respondent, strategy-auditor упоминаются, но создаются в TASK-005; E2E-прогон навыков на демо-кейсе не выполнялся (TASK-005)
+predecessor_ref: AUDIT TASK-003 (71e7ae3)
