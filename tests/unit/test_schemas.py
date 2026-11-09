@@ -483,6 +483,18 @@ class SchemaValidatorTest(unittest.TestCase):
         graph["hypotheses"][1]["confidence"] = "high"
         self.assertIn("SYNTHETIC_HIGH_CONFIDENCE", sv.codes(sv.validate_evidence_graph(graph)))
 
+        # CORE-01: смешанные ссылки (реальный факт + нераскрытый синтетический респондент)
+        graph2 = valid_evidence()
+        dec2 = valid_decision()
+        dec2["product_strategy"]["evidence_refs"] = ["F-001", "H-002"]
+        dec2["product_strategy"]["assumptions_and_limits"] = []
+        self.assertIn("SYNTHETIC_UNDISCLOSED_BASIS", sv.codes(sv.validate_decision(dec2, graph2)))
+
+        # CORE-01: proof_point в коммуникационной стратегии не может опираться на синтетического респондента
+        dec3 = valid_decision()
+        dec3["communication_strategy"]["proof_points"][0]["evidence_refs"] = ["H-002"]
+        self.assertIn("SYNTHETIC_PROOF_POINT", sv.codes(sv.validate_decision(dec3, graph2)))
+
     def test_08_t05_alternatives_business_rules(self):
         graph = valid_evidence()
         # Нет status_quo и sunset_or_close, пустое возражение, менее 3 вариантов
@@ -525,6 +537,17 @@ class SchemaValidatorTest(unittest.TestCase):
         c = sv.codes(sv.validate_decision(decision, graph))
         self.assertIn("T06_INCONSISTENT_COMMUNICATION", c)
         self.assertIn("T06_UNSUPPORTED_PROMISE", c)
+
+        # CORE-02: обещание в коммуникации противоречит explicit_refusals
+        dec2 = valid_decision()
+        dec2["communication_strategy"]["proof_points"][0]["promise"] = (
+            "Начисляем повышенный кэшбэк по программе лояльности с первого дня"
+        )
+        self.assertIn("T06_PROMISES_EXPLICIT_REFUSAL", sv.codes(sv.validate_decision(dec2, graph)))
+
+        dec3 = valid_decision()
+        dec3["product_strategy"]["explicit_refusals"] = ["   "]
+        self.assertIn("T06_EMPTY_EXPLICIT_REFUSAL", sv.codes(sv.validate_decision(dec3, graph)))
 
     def test_10_t01_t09_t11_state_workflow_recovery_and_cost_ledger(self):
         state = valid_state()

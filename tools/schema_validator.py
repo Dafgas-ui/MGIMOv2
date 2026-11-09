@@ -603,6 +603,85 @@ def _unsafe_path(path):
     return ".." in re.split(r"[/\\]", path)
 
 
+_REFUSAL_PREFIX_RE = re.compile(
+    r"^(?:осознанный\s+отказ(?:\s+от)?|отказываемся(?:\s+от)?|отказ(?:\s+от)?|"
+    r"не\s+(?:делаем|строим|обещаем|включаем|запускаем|поддерживаем|реализуем|"
+    r"предлагаем|вводим|добавляем|используем|даём|даем|гарантируем|фокусируемся\s+на)|"
+    r"без|we\s+do\s+not(?:\s+build|\s+offer|\s+promise|\s+provide)?|no)\s+",
+    re.IGNORECASE,
+)
+_REFUSAL_STOPWORDS = frozenset({
+    "и", "в", "во", "на", "по", "с", "со", "к", "ко", "от", "до", "из", "за", "у", "о", "об", "для", "при", "без",
+    "или", "а", "но", "не", "ни", "же", "ли", "бы", "как", "что", "это", "этот", "эта", "эти", "этом", "этого",
+    "этой", "этих", "тот", "та", "те", "все", "всё", "вся", "весь", "всех", "свой", "свои", "своих", "наш", "наши",
+    "наших", "любой", "любые", "рамках", "текущем", "текущего", "данном", "данного", "первом", "этапе", "квартале",
+    "релизе", "версии", "продукта", "сервиса", "пользователя", "пользователей", "пользователем", "клиента",
+    "клиентов", "сценария", "сценариев", "сценарий", "настройки", "настройку", "настройкой", "настройте",
+    "условий", "условия", "условиями", "подписки", "подписку", "подпиской", "приложения", "приложении",
+    "работы", "работу", "решения", "решение", "задачи", "задачу", "функции", "функцию", "возможности",
+    "the", "a", "an", "of", "to", "in", "on", "for", "with", "without", "and", "or", "by", "this",
+})
+_WORD_RE = re.compile(r"[a-zа-яё0-9]{3,}", re.IGNORECASE)
+
+
+def _stem_token(w):
+    w = w.lower().replace("ё", "е")
+    return w[:6] if len(w) > 6 else w
+
+
+def _refusal_clauses_and_stems(refusal_text):
+    """Разбивает формулировку отказа на смысловые клаузы и их ключевые основы (без префикса 'не делаем')."""
+    text = refusal_text.strip()
+    while True:
+        new_text = _REFUSAL_PREFIX_RE.sub("", text).strip(" .,;:!—–-\"'«»")
+        if new_text == text:
+            break
+        text = new_text
+    # Отсекаем уточняющие оговорки вида «без настройки ...» / «при условии ...»
+    text = re.split(r"\s+(?:без|при\s+условии|если|кроме|за\s+исключением)\s+", text, maxsplit=1, flags=re.IGNORECASE)[0]
+    clauses = re.split(r"\s+(?:и|или|а\s+также|либо)\s+|[,;]", text, flags=re.IGNORECASE)
+    result = []
+    for clause in clauses:
+        clean = _REFUSAL_PREFIX_RE.sub("", clause.strip()).strip(" .,;:!—–-\"'«»")
+        words = [w.lower().replace("ё", "е") for w in _WORD_RE.findall(clean)]
+        sig = [_stem_token(w) for w in words if w not in _REFUSAL_STOPWORDS and len(w) >= 4]
+        if sig:
+            result.append((clean.lower().replace("ё", "е"), _unique(sig)))
+    return result
+
+
+def _text_promises_refusal(promise_text, refusal_text):
+    """True, если текст обещания/сообщения обещает то, что запрещено в explicit_refusals (T06)."""
+    if not isinstance(promise_text, str) or not isinstance(refusal_text, str):
+        return False
+    norm_p = " ".join(promise_text.lower().replace("ё", "е").split())
+    # Если в самом сообщении явно сказано, что мы этого НЕ делаем / без этого — это честное предупреждение
+    p_words = [w.lower().replace("ё", "е") for w in _WORD_RE.findall(norm_p)]
+    p_stems = {_stem_token(w) for w in p_words}
+    for phrase, stems in _refusal_clauses_and_stems(refusal_text):
+        if len(phrase) >= 5 and phrase in norm_p:
+            idx_pos = norm_p.find(phrase)
+            prefix = norm_p[max(0, idx_pos - 25):idx_pos]
+            if not re.search(r"\b(?:не|без|нет|никогда|no|not|without)\b", prefix):
+                return True
+        if not stems:
+            continue
+        matched = [s for s in stems if s in p_stems]
+        need = 1 if len(stems) == 1 else min(2, len(stems))
+        if len(matched) >= need:
+            # Проверяем, не стоят ли совпавшие слова под отрицанием ('не обещаем кэшбэк', 'без кэшбэка')
+            negated = False
+            for s in matched:
+                for m in re.finditer(re.escape(s), norm_p):
+                    prefix = norm_p[max(0, m.start() - 25):m.start()]
+                    if re.search(r"\b(?:не|без|нет|никогда|отказ\w*|no|not|without)\b", prefix):
+                        negated = True
+                        break
+            if not negated:
+                return True
+    return False
+
+
 class EvidenceIndex:
     """Индекс узлов графа доказательств: id -> (раздел, позиция, узел)."""
 
@@ -935,6 +1014,11 @@ def decision_invariants(decision, graph, file=CASE_FILES["decision"]):
         if isinstance(link, str):
             for ref in _unique(INLINE_REF_RE.findall(link)):
                 check_ref(ref, "/product_strategy/unit_economics_link", track=False)
+        raw_refusals = _list(ps, "explicit_refusals")
+        if not raw_refusals or any(not _nonblank(r) for r in raw_refusals):
+            add("T06_EMPTY_EXPLICIT_REFUSAL",
+                "product_strategy.explicit_refusals должен содержать непустые формулировки осознанных отказов",
+                "/product_strategy/explicit_refusals")
         if idx is not None:
             synthetic = [r for r in evidence if idx.section(r) == "hypotheses"
                          and idx.node(r).get("is_synthetic_respondent") is True]
@@ -945,6 +1029,11 @@ def decision_invariants(decision, graph, file=CASE_FILES["decision"]):
                     f"выбранная стратегия опирается только на ответы модельных респондентов "
                     f"({', '.join(undisclosed)}) без реальных фактов F/C и без явной пометки "
                     f"synthetic_respondent_basis в assumptions_and_limits", "/product_strategy/evidence_refs")
+            elif undisclosed:
+                add("SYNTHETIC_UNDISCLOSED_BASIS",
+                    f"в основаниях стратегии присутствуют ответы модельных респондентов "
+                    f"({', '.join(undisclosed)}), не задекларированные в assumptions_and_limits "
+                    f"с kind=synthetic_respondent_basis", "/product_strategy/assumptions_and_limits")
             plain_hypotheses = [r for r in evidence if idx.section(r) == "hypotheses"
                                 and r not in synthetic and r not in disclosed_any]
             if plain_hypotheses:
@@ -969,14 +1058,47 @@ def decision_invariants(decision, graph, file=CASE_FILES["decision"]):
             add("T06_INCONSISTENT_COMMUNICATION",
                 "consistency_check.is_consistent должен быть true: коммуникация не может обещать то, "
                 "от чего продукт осознанно отказался", "/communication_strategy/consistency_check/is_consistent")
+        refusals = [r for r in (_list(ps, "explicit_refusals") if ps is not None else []) if _nonblank(r)]
+        key_msg = cs.get("key_message")
+        if _nonblank(key_msg):
+            for ref_text in refusals:
+                if _text_promises_refusal(key_msg, ref_text):
+                    add("T06_PROMISES_EXPLICIT_REFUSAL",
+                        f"key_message обещает то, от чего продукт отказался в explicit_refusals ({ref_text!r})",
+                        "/communication_strategy/key_message")
+                    break
         for k, pp in _iter_nodes(cs, "proof_points"):
             cap = pp.get("product_capability_ref")
             if ps is not None and isinstance(cap, str) and cap not in capabilities:
                 add("T06_UNSUPPORTED_PROMISE",
                     f"обещание ссылается на свойство {cap}, которого нет в product_strategy.key_capabilities",
                     f"/communication_strategy/proof_points/{k}/product_capability_ref")
+            promise_text = pp.get("promise")
+            if _nonblank(promise_text):
+                for ref_text in refusals:
+                    if _text_promises_refusal(promise_text, ref_text):
+                        add("T06_PROMISES_EXPLICIT_REFUSAL",
+                            f"обещание в proof_points[{k}] противоречит explicit_refusals ({ref_text!r})",
+                            f"/communication_strategy/proof_points/{k}/promise")
+                        break
+            pp_valid_refs = []
             for j, ref in _iter_refs(pp, "evidence_refs"):
-                check_ref(ref, f"/communication_strategy/proof_points/{k}/evidence_refs/{j}", evidence_sections)
+                if check_ref(ref, f"/communication_strategy/proof_points/{k}/evidence_refs/{j}", evidence_sections):
+                    pp_valid_refs.append(ref)
+            if idx is not None and pp_valid_refs:
+                pp_synth = [r for r in pp_valid_refs if idx.section(r) == "hypotheses"
+                            and idx.node(r).get("is_synthetic_respondent") is True]
+                pp_real = [r for r in pp_valid_refs if idx.section(r) in ("findings", "calculations")]
+                if pp_synth and not pp_real:
+                    add("SYNTHETIC_PROOF_POINT",
+                        f"обещание клиенту в proof_points[{k}] опирается на ответы модельных респондентов "
+                        f"({', '.join(pp_synth)}) без реальных фактов F/C",
+                        f"/communication_strategy/proof_points/{k}/evidence_refs")
+                elif pp_synth:
+                    add("SYNTHETIC_PROOF_POINT",
+                        f"обещание клиенту в proof_points[{k}] включает ссылку на модельного респондента "
+                        f"({', '.join(pp_synth)}); синтетические ответы нельзя использовать как подтверждение обещаний",
+                        f"/communication_strategy/proof_points/{k}/evidence_refs")
 
     # --- Сопровождение решения и пересмотр (T08)
     ds = _dict(decision, "decision_support_and_reassessment")
