@@ -42,3 +42,16 @@ changed_files: docs/coordination/task-board.md, docs/coordination/review-handoff
 verified_checks: python tools/check_coordination.py -> PASS; python -m unittest discover -s tests/unit -v -> 8 tests OK; SHA-256 AGENTS.md match; ТЗ.txt vs docs/contest-brief.md text match (80/80 lines); edge-case verification of check_coordination.py
 limitations: Неблокирующее замечание COORD-01 (Low): check_coordination.py проверяет наличие блока HANDOFF и commit_hash для READY_FOR_REVIEW, но не валидирует полноту всех 10 полей записи и наличие блока AUDIT при выставленном audit_status
 predecessor_ref: HANDOFF TASK-000 (d6e54f7)
+
+
+## [HANDOFF] TASK-001 — 2026-11-09 11:21
+task_id: TASK-001
+record_type: HANDOFF
+author: Opus-Core
+timestamp: 2026-11-09 11:21
+commit_hash: c2b3aca
+agents_md_sha256: 57bf75979bd8d3b17fef9c137c09f9b96bbf5504b8699080955c13da9c900b73
+changed_files: schemas/evidence.schema.json, schemas/decision.schema.json, schemas/state.schema.json, tools/schema_validator.py, tests/unit/test_schemas.py, docs/coordination/task-board.md, docs/coordination/review-handoff.md
+verified_checks: python tools/schema_validator.py --check-schemas -> PASS (3 schemas); python -m unittest discover -s tests/unit -v -> 20 tests OK; python tools/check_coordination.py -> PASS
+limitations: Валидатор реализован на стандартной библиотеке Python 3 и поддерживает зафиксированное в SUPPORTED_KEYWORDS подмножество JSON Schema Draft 2020-12 (с проверкой format date-time/date как утверждений); хэши в artifacts_integrity вычисляются с нормализацией CRLF->LF (artifact_sha256) для переносимости между ОС
+predecessor_ref: AUDIT TASK-000 (8cc73a3)
