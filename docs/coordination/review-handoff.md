@@ -145,3 +145,16 @@ changed_files: docs/coordination/task-board.md, docs/coordination/review-handoff
 verified_checks: python tools/check_coordination.py -> PASS; python -m unittest discover -s tests/unit -v -> 37 tests OK; automated scan of agent/, knowledge/, skills/ for Contour B leaks -> 0 leaks; validation of all 7 JSON examples in skills/*/SKILL.md against schemas/*.schema.json -> PASS; validation of all 31 CLI commands in skills/*/SKILL.md against strategist_cli.build_parser() -> PASS; verification of CORE-03 closure
 limitations: CORE-03 закрыт регламентно во всех 4 навыках и runtime-instructions.md. Неблокирующее замечание SKILL-01 (Low): в problem-framing/SKILL.md и runtime-instructions.md приведена команда advance-stage --to INTAKE --awaiting-human true, однако при current_stage == INTAKE функция advance_stage отклоняет переход в тот же этап (срабатывает только при rollback в INTAKE; при нахождении уже в INTAKE ожидание фиксируется в state.json — учесть в TASK-005)
 predecessor_ref: HANDOFF TASK-004 (db0ffdc)
+
+
+## [HANDOFF] TASK-005 — 2026-11-09 17:45
+task_id: TASK-005
+record_type: HANDOFF
+author: Opus-Mind
+timestamp: 2026-11-09 17:45
+commit_hash: cf9eaa8
+agents_md_sha256: 57bf75979bd8d3b17fef9c137c09f9b96bbf5504b8699080955c13da9c900b73
+changed_files: agent/runtime-instructions.md, skills/problem-framing/SKILL.md, agents/README.md, agents/research-analyst.md, agents/synthetic-respondent.md, agents/strategy-auditor.md, projects/demo_mvp/ (brief.md, sources/*, evidence/*, decisions/*, outputs/*, state.json), tests/unit/test_session_recovery_hook.py, docs/coordination/task-board.md, docs/coordination/review-handoff.md
+verified_checks: python tools/schema_validator.py --case projects/demo_mvp --strict -> PASS (0 errors, 0 warnings); python tools/strategist_cli.py status --case projects/demo_mvp -> PASS (stage DECISION_MONITORING, 6 tracked artifacts OK, 0 stale nodes); python tools/session_recovery_hook.py --test-case projects/demo_mvp -> OK (systemMessage recovery summary); python -m unittest discover -s tests/unit -v -> 37 tests OK; automated scan for Contour B leaks in runtime dirs -> 0 leaks; closure of SKILL-01; prompt injection isolation verified in S-003 (T10); metric denominator conflict verified in F-001/F-002/X-001 (T03); data gaps verified in G-001/G-002 (T04); synthetic respondent guard verified in H-002 and assumptions_and_limits (CORE-01, T06); python tools/check_coordination.py -> PASS
+limitations: В тесте test_session_recovery_hook.py (test_02) скорректирован вызов subprocess с передачей изолированного --test-case, так как при появлении реального state.json в projects/demo_mvp вызов хука без аргументов закономерно обнаруживает демо-кейс репозитория (HOOK-01); демо-кейс находится на этапе DECISION_MONITORING с approved_by_human (финальное состояние полного цикла); в сценарии T08 проверка каскадной инвалидации выполняется независимым аудитором в TASK-006
+predecessor_ref: AUDIT TASK-004 (015130c)
