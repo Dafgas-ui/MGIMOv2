@@ -41,10 +41,11 @@ class SessionRecoveryHookTest(unittest.TestCase):
         payload = hook.generate_recovery_payload(root_dir=self.tmp)
         self.assertEqual(payload, {})
 
-        # 2. Subprocess вызов в чистом каталоге
+        # 2. Subprocess вызов с изолированным кейсом
         hook_script = ROOT / "tools" / "session_recovery_hook.py"
+        empty_case = self.tmp / "nonexistent_empty_case"
         res = subprocess.run(
-            [sys.executable, str(hook_script)],
+            [sys.executable, str(hook_script), "--test-case", str(empty_case)],
             cwd=str(self.tmp),
             capture_output=True,
             text=True,

@@ -1,0 +1,230 @@
+{
+  "case_id": "demo_mvp",
+  "schema_version": "1.0",
+  "created_at": "2026-11-09T17:22:11+03:00",
+  "updated_at": "2026-11-09T17:36:53+03:00",
+  "problem_framing": {
+    "raw_request": "Падает M2 Retention сервиса Семейный Щит, аналитика дает противоречивые данные по конверсии 4.2% vs 18.5%, команда спорит: запускать ИИ-детектор дипфейков, пересобрать семейный онбординг, оставить как есть или закрыть витрину",
+    "clarified_problem": "Падение удержания M2 и методологическое расхождение воронки конверсии при выборе между дорогой ИИ-функциональностью и оптимизацией семейного онбординга",
+    "goal": "Разработать доказательную продуктовую и коммуникационную стратегию B2C-подписки с обоснованным выбором варианта, юнит-экономикой и планом проверки",
+    "decision_recipient": "Руководитель Фабрики Продуктов МегаФона и совет директоров",
+    "constraints": [
+      "Без передачи персональных данных абонентов",
+      "Ограничение R&D бюджета на GPU-инфраструктуру",
+      "Сохранение положительной юнит-экономики при ARPU 199 руб."
+    ],
+    "available_data_summary": null,
+    "pending_clarifying_questions": []
+  },
+  "workflow": {
+    "current_stage": "DECISION_MONITORING",
+    "completed_stages": [
+      "INTAKE",
+      "RESEARCH_PLANNING",
+      "EVIDENCE_COLLECTION",
+      "EVIDENCE_VALIDATION",
+      "OPTIONS_GENERATION",
+      "STRATEGY_DESIGN",
+      "INDEPENDENT_REVIEW",
+      "HUMAN_DECISION"
+    ],
+    "stage_history": [
+      {
+        "from_stage": null,
+        "to_stage": "INTAKE",
+        "timestamp": "2026-11-09T17:22:11+03:00",
+        "transition_type": "start",
+        "reason": "Инициализация кейса"
+      },
+      {
+        "from_stage": "INTAKE",
+        "to_stage": "RESEARCH_PLANNING",
+        "timestamp": "2026-11-09T17:33:42+03:00",
+        "transition_type": "forward",
+        "reason": "Рамка задачи и ограничения согласованы"
+      },
+      {
+        "from_stage": "RESEARCH_PLANNING",
+        "to_stage": "EVIDENCE_COLLECTION",
+        "timestamp": "2026-11-09T17:33:52+03:00",
+        "transition_type": "forward",
+        "reason": "Исследовательские вопросы Q-001..Q-003 сформированы"
+      },
+      {
+        "from_stage": "EVIDENCE_COLLECTION",
+        "to_stage": "EVIDENCE_VALIDATION",
+        "timestamp": "2026-11-09T17:34:05+03:00",
+        "transition_type": "forward",
+        "reason": "Источники S-001..S-004 и факты F-001..F-006 собраны"
+      },
+      {
+        "from_stage": "EVIDENCE_VALIDATION",
+        "to_stage": "OPTIONS_GENERATION",
+        "timestamp": "2026-11-09T17:34:17+03:00",
+        "transition_type": "forward",
+        "reason": "Методологическое расхождение X-001 объяснено, расчеты C-001..C-003 проверены"
+      },
+      {
+        "from_stage": "OPTIONS_GENERATION",
+        "to_stage": "STRATEGY_DESIGN",
+        "timestamp": "2026-11-09T17:34:28+03:00",
+        "transition_type": "forward",
+        "reason": "Сформированы 4 альтернативы O-001..O-004 с сильными возражениями"
+      },
+      {
+        "from_stage": "STRATEGY_DESIGN",
+        "to_stage": "INDEPENDENT_REVIEW",
+        "timestamp": "2026-11-09T17:34:38+03:00",
+        "transition_type": "forward",
+        "reason": "Стратегия O-004 спроектирована, передана на независимый аудит"
+      },
+      {
+        "from_stage": "INDEPENDENT_REVIEW",
+        "to_stage": "HUMAN_DECISION",
+        "timestamp": "2026-11-09T17:34:49+03:00",
+        "transition_type": "forward",
+        "reason": "Аудит пройден без блокирующих замечаний, передача на утверждение человеку"
+      },
+      {
+        "from_stage": "HUMAN_DECISION",
+        "to_stage": "DECISION_MONITORING",
+        "timestamp": "2026-11-09T17:34:59+03:00",
+        "transition_type": "forward",
+        "reason": "Руководитель продукта утвердил вариант O-004, запуск мониторинга обязательств K-001..K-003"
+      }
+    ],
+    "awaiting_human_approval": {
+      "is_awaiting": false,
+      "reason": null
+    }
+  },
+  "checkpoints_and_recovery": {
+    "last_completed_operation_id": "step-007-human-decision",
+    "in_progress_operation": null,
+    "artifacts_integrity": [
+      {
+        "path": "evidence/evidence_graph.json",
+        "sha256": "563c29d25987e6d1fc0bae23db5b664f23be25256a798b9a307a92923238d619",
+        "recorded_at": "2026-11-09T17:36:53+03:00"
+      },
+      {
+        "path": "decisions/strategy_decision.json",
+        "sha256": "436220a2b240476c8a7c8df6e3db2706fc6209091e9fd2a5ebf0368164373d9d",
+        "recorded_at": "2026-11-09T17:36:53+03:00"
+      },
+      {
+        "path": "outputs/01_research_and_evidence.md",
+        "sha256": "bb3d841c2496513de092172154fc20ac8628b7036f12124a1b6c030f3104498c",
+        "recorded_at": "2026-11-09T17:36:53+03:00"
+      },
+      {
+        "path": "outputs/02_alternatives_comparison.md",
+        "sha256": "218331fec1f38820429d858c4b44c5363c1f69bbcde7b1371894fee83c9a6a05",
+        "recorded_at": "2026-11-09T17:36:53+03:00"
+      },
+      {
+        "path": "outputs/03_product_and_comm_strategy.md",
+        "sha256": "b75055fea02e005f21de476f85194fb7c4f319535bc18961f7f5e722b54b5d59",
+        "recorded_at": "2026-11-09T17:36:53+03:00"
+      },
+      {
+        "path": "outputs/04_validation_plan_and_governance.md",
+        "sha256": "7c0dc398da8be85b89401d35d2fa815b08bbee597f691893ec7e00d341f095dd",
+        "recorded_at": "2026-11-09T17:36:53+03:00"
+      }
+    ]
+  },
+  "cost_and_usage_ledger": {
+    "entries": [
+      {
+        "step_id": "step-001-framing",
+        "timestamp": "2026-11-09T17:35:17+03:00",
+        "actor_or_tool": "problem-framing",
+        "model_tier": "standard",
+        "duration_sec": 35.0,
+        "tokens_in": 2400,
+        "tokens_out": 850,
+        "estimated_cost_usd": 0.012,
+        "is_estimated": true,
+        "notes": "Уточнение задачи и фиксация проблемы в state.json"
+      },
+      {
+        "step_id": "step-002-data-ingestion",
+        "timestamp": "2026-11-09T17:35:34+03:00",
+        "actor_or_tool": "research-analyst",
+        "model_tier": "light",
+        "duration_sec": 18.0,
+        "tokens_in": 8500,
+        "tokens_out": 1200,
+        "estimated_cost_usd": 0.003,
+        "is_estimated": true,
+        "notes": "Первичный разбор выгрузок billing_funnel_q3.csv и product_analytics_q3.csv"
+      },
+      {
+        "step_id": "step-003-synthetic-session",
+        "timestamp": "2026-11-09T17:35:43+03:00",
+        "actor_or_tool": "synthetic-respondent",
+        "model_tier": "light",
+        "duration_sec": 14.0,
+        "tokens_in": 1800,
+        "tokens_out": 650,
+        "estimated_cost_usd": 0.001,
+        "is_estimated": true,
+        "notes": "Синтетическое интервью с профилем Взрослый сын 34 года"
+      },
+      {
+        "step_id": "step-004-csv-analysis",
+        "timestamp": "2026-11-09T17:35:55+03:00",
+        "actor_or_tool": "tools/strategist_cli.py",
+        "model_tier": "none",
+        "duration_sec": 2.0,
+        "tokens_in": 0,
+        "tokens_out": 0,
+        "estimated_cost_usd": 0.0,
+        "is_estimated": false,
+        "notes": "Детерминированный расчет метрик и сверка знаменателей (T02-T04)"
+      },
+      {
+        "step_id": "step-005-strategy-design",
+        "timestamp": "2026-11-09T17:36:07+03:00",
+        "actor_or_tool": "options-and-strategy",
+        "model_tier": "heavy",
+        "duration_sec": 45.0,
+        "tokens_in": 12000,
+        "tokens_out": 3500,
+        "estimated_cost_usd": 0.045,
+        "is_estimated": true,
+        "notes": "Проектирование 4 альтернатив, продуктовой и коммуникационной стратегий"
+      },
+      {
+        "step_id": "step-006-audit-review",
+        "timestamp": "2026-11-09T17:36:18+03:00",
+        "actor_or_tool": "strategy-auditor",
+        "model_tier": "heavy",
+        "duration_sec": 28.0,
+        "tokens_in": 14000,
+        "tokens_out": 2100,
+        "estimated_cost_usd": 0.038,
+        "is_estimated": true,
+        "notes": "Критический аудит независимым ревизором"
+      },
+      {
+        "step_id": "step-007-human-decision",
+        "timestamp": "2026-11-09T17:36:30+03:00",
+        "actor_or_tool": "product-owner",
+        "model_tier": "human",
+        "duration_sec": 600.0,
+        "tokens_in": 0,
+        "tokens_out": 0,
+        "estimated_cost_usd": 0.0,
+        "is_estimated": false,
+        "notes": "Утверждение варианта O-004 руководителем Фабрики Продуктов"
+      }
+    ],
+    "totals": {
+      "total_duration_sec": 742.0,
+      "total_tokens": 47000,
+      "total_estimated_cost_usd": 0.099
+    }
+  }
+}

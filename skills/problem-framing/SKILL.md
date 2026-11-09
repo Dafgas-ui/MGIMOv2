@@ -62,13 +62,16 @@ python tools/strategist_cli.py init-case --case projects/<case> \
 - Формулируй вопросы с вариантами ответа, чтобы ответ занял секунды.
 
 Если вопрос блокирующий — останови workflow:
-
-```
-python tools/strategist_cli.py advance-stage --case projects/<case> --to INTAKE \
-  --awaiting-human true --awaiting-reason "<какой ответ нужен>"
-```
-
-Когда ответ получен — снимай ожидание следующим переходом.
+- **При первичном старте** (когда `current_stage` уже `INTAKE`): блокирующие вопросы `pending_clarifying_questions`, флаг `awaiting_human_approval: true` и `awaiting_reason` записываются напрямую в `state.json`. После получения ответа пользователя переход выполняется на следующем шаге:
+  ```
+  python tools/strategist_cli.py advance-stage --case projects/<case> \
+    --to RESEARCH_PLANNING --note "ответы на блокирующие вопросы получены"
+  ```
+- **При возврате (откате) в `INTAKE`** с более позднего этапа (например, после каскадного пересмотра или аудита):
+  ```
+  python tools/strategist_cli.py advance-stage --case projects/<case> --to INTAKE \
+    --awaiting-human true --awaiting-reason "<какой ответ нужен>"
+  ```
 
 ## Шаг 4. Перейти к планированию
 

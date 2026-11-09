@@ -41,7 +41,7 @@
 
 ### CLI по этапам
 
-- `INTAKE`: `resume` / `init-case`; при блокирующих вопросах — `advance-stage --to INTAKE --awaiting-human true --awaiting-reason "..."`.
+- `INTAKE`: `resume` / `init-case`; при блокирующих вопросах на первичном старте они и `awaiting_human_approval: true` пишутся напрямую в `state.json`; команда `advance-stage --to INTAKE --awaiting-human true --awaiting-reason "..."` используется при возврате (откате) в `INTAKE` с более позднего этапа.
 - `RESEARCH_PLANNING`: `upsert-node --collection research_questions --payload '{...}'`.
 - `EVIDENCE_COLLECTION`: `upsert-node --collection sources|findings|calculations`; для таблиц — `analyze-csv --file ... [--compare-file ...]`.
 - `EVIDENCE_VALIDATION`: `analyze-csv` со сверкой знаменателей; `upsert-node --collection contradictions|knowledge_gaps|hypotheses`; `status`.

@@ -13,5 +13,5 @@
 | TASK-002 | Ядро Python CLI tools/strategist_cli.py и unit-тесты | Opus-Core | Argon-Judge | READY_FOR_REVIEW | PASS | ACCEPTED | b8dca7a | Неделя 1 |
 | TASK-003 | Хук автовосстановления сессии .agents/hooks.json | Sonnet-Staff | Argon-Judge | READY_FOR_REVIEW | PASS | ACCEPTED | d6f669c | Неделя 1 |
 | TASK-004 | Оркестратор agent/runtime-instructions.md, база knowledge/ и 4 базовых навыка в skills/ | Opus-Mind | Argon-Judge | READY_FOR_REVIEW | PASS | ACCEPTED | db0ffdc | Неделя 1 |
-| TASK-005 | Продуктовые субагенты в agents/ и тренировочный кейс в projects/demo_mvp/ | Opus-Mind | Argon-Judge | PLANNED | PENDING | PENDING | - | Неделя 1 |
+| TASK-005 | Продуктовые субагенты в agents/ и тренировочный кейс в projects/demo_mvp/ | Opus-Mind | Argon-Judge | READY_FOR_REVIEW | PENDING | PENDING | - | Неделя 1 |
 | TASK-006 | Сквозные приёмочные испытания T01–T12 и релиз MVP | Argon-Judge | Argon-Prime | PLANNED | PENDING | PENDING | - | Неделя 1 |

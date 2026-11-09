@@ -1,0 +1,301 @@
+{
+  "case_id": "demo_mvp",
+  "schema_version": "1.0",
+  "updated_at": "2026-11-09T16:00:00+03:00",
+  "research_questions": [
+    {
+      "id": "Q-001",
+      "question": "Какова реальная конверсия в платную подписку за 2026-Q3 и где ключевое методологическое расхождение между маркетингом и продуктовой аналитикой?",
+      "decision_impact": "Если расхождение вызвано разными знаменателями воронки (визиты vs триалы), устраняем конфликт отчетов и выбираем правильную базовую метрику для воронки",
+      "status": "answered",
+      "answer_refs": [
+        "F-001",
+        "F-002"
+      ]
+    },
+    {
+      "id": "Q-002",
+      "question": "Какова юнит-экономика и технологическая целесообразность потокового real-time ИИ-детектора дипфейков при текущем ARPU 199 руб./мес.?",
+      "decision_impact": "Если себестоимость GPU-инференса превышает 50% ARPU, исключаем real-time ИИ-детектор из базовой подписки и фиксируем явный отказ в стратегии",
+      "status": "answered",
+      "answer_refs": [
+        "F-003",
+        "C-001"
+      ]
+    },
+    {
+      "id": "Q-003",
+      "question": "Где главный барьер в текущем онбординге и как привязка родственников влияет на удержание 2-го месяца (M2 Retention)?",
+      "decision_impact": "Если семейная связка дает кратный рост удержания (с 24% до 68%), пересобираем онбординг с фокусом на бесшовное подключение близких",
+      "status": "answered",
+      "answer_refs": [
+        "F-004",
+        "F-005",
+        "C-002",
+        "H-002"
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "id": "S-001",
+      "title": "Финансовый отчет биллинга по воронке подписок за 2026-Q3",
+      "source_type": "spreadsheet",
+      "location": "projects/demo_mvp/sources/billing_funnel_q3.csv",
+      "trust_boundary": "untrusted_data",
+      "verification_level": "content_verified",
+      "content_hash": "sha256:39a51bc596d7ef7eac88565faa67d61d4ef99283835eac62b74491fa2b935587",
+      "version": "1.0",
+      "retrieved_at": "2026-11-09T10:00:00+03:00",
+      "notes": "Выгрузка биллинга; зафиксированы пропуски в cac_rub и m2_retention_pct по 2 регионам (T04)"
+    },
+    {
+      "id": "S-002",
+      "title": "Продуктовая аналитика триалов и использования сервиса за 2026-Q3",
+      "source_type": "spreadsheet",
+      "location": "projects/demo_mvp/sources/product_analytics_q3.csv",
+      "trust_boundary": "untrusted_data",
+      "verification_level": "content_verified",
+      "content_hash": "sha256:e441ca1136d8f2e46919d3bc11d69a217d425bbbe126ee50387ebd30911c76b7",
+      "version": "1.0",
+      "retrieved_at": "2026-11-09T10:15:00+03:00",
+      "notes": "Выгрузка продуктовых событий триалов; числитель оплат совпадает с S-001 (8026)"
+    },
+    {
+      "id": "S-003",
+      "title": "Аналитический обзор рынка, привычных альтернатив и R&D оценок ИИ-защиты (2026)",
+      "source_type": "document",
+      "location": "projects/demo_mvp/sources/market_and_competitors_2026.md",
+      "trust_boundary": "untrusted_data",
+      "verification_level": "content_verified",
+      "content_hash": "sha256:499f9e5a2ad99c71b7fa1f943156908e82ce2ea28d47fbf26bcc3b1ad2cb02b8",
+      "version": "2026-Q3",
+      "retrieved_at": "2026-11-09T10:30:00+03:00",
+      "notes": "В тексте источника выявлена и нейтрализована попытка Prompt Injection [SYSTEM INSTRUCTION OVERRIDE]; анализ выполнен в режиме untrusted_data без изменения системных правил (T10)"
+    },
+    {
+      "id": "S-004",
+      "title": "UX-аудит экранов онбординга, глубинные интервью и синтетическая сессия",
+      "source_type": "document",
+      "location": "projects/demo_mvp/sources/ux_audit_and_interviews.md",
+      "trust_boundary": "untrusted_data",
+      "verification_level": "content_verified",
+      "content_hash": "sha256:31b25acca498042bfeb6304dc678bc01bf47785b7cc32b9a2bed243bed7ff090",
+      "version": "1.0",
+      "retrieved_at": "2026-11-09T11:00:00+03:00",
+      "notes": "14 глубинных интервью, воронка 5 экранов онбординга и 1 синтетическая сессия"
+    }
+  ],
+  "findings": [
+    {
+      "id": "F-001",
+      "statement": "Конверсия посетителей лендинга в платную подписку за 2026-Q3 составила 4.2%",
+      "source_refs": [
+        "S-001"
+      ],
+      "exact_locator": "billing_funnel_q3.csv, агрегированные суммы paid_subscriptions (8026) / landing_visitors (191100)",
+      "metric_definition": {
+        "metric_name": "conversion_to_paid",
+        "numerator": "успешные платные подписки",
+        "denominator": "уникальные посетители лендинга",
+        "period": "2026-Q3",
+        "unit": "%",
+        "value": 4.2
+      },
+      "validity_status": "valid"
+    },
+    {
+      "id": "F-002",
+      "statement": "Конверсия активированных триалов в платную подписку за 2026-Q3 составила 18.5%",
+      "source_refs": [
+        "S-002"
+      ],
+      "exact_locator": "product_analytics_q3.csv, агрегированные суммы paid_subscriptions (8026) / activated_trials (43384)",
+      "metric_definition": {
+        "metric_name": "conversion_to_paid",
+        "numerator": "успешные платные подписки",
+        "denominator": "активированные триалы",
+        "period": "2026-Q3",
+        "unit": "%",
+        "value": 18.5
+      },
+      "validity_status": "valid"
+    },
+    {
+      "id": "F-003",
+      "statement": "Себестоимость GPU-инференса потокового ИИ-анализа речи составляет 117-153 руб./мес. на абонента при 180 минутах входящих разговоров",
+      "source_refs": [
+        "S-003"
+      ],
+      "exact_locator": "market_and_competitors_2026.md, раздел 3 'Технологическая и экономическая оценка'",
+      "metric_definition": {
+        "metric_name": "gpu_inference_cost_per_sub",
+        "numerator": "затраты на GPU-инференс в рублях",
+        "denominator": "активный абонент в месяц",
+        "period": "2026-Q3",
+        "unit": "RUB",
+        "value": 135.0
+      },
+      "validity_status": "valid"
+    },
+    {
+      "id": "F-004",
+      "statement": "77.2% пользователей покидают воронку онбординга на экране №2 из-за требования немедленного ввода номера родственника и отправки SMS-кода",
+      "source_refs": [
+        "S-004"
+      ],
+      "exact_locator": "ux_audit_and_interviews.md, раздел 1 'UX-аудит текущей воронки онбординга'",
+      "metric_definition": {
+        "metric_name": "onboarding_screen2_dropoff_rate",
+        "numerator": "пользователи, покинувшие экран 2",
+        "denominator": "пользователи, начавшие онбординг",
+        "period": "2026-Q3",
+        "unit": "%",
+        "value": 77.2
+      },
+      "validity_status": "valid"
+    },
+    {
+      "id": "F-005",
+      "statement": "M2 Retention у пользователей, подключивших хотя бы 1 родственника в первую неделю, составляет 68.4% против 24.1% у одиночных аккаунтов",
+      "source_refs": [
+        "S-004"
+      ],
+      "exact_locator": "ux_audit_and_interviews.md, раздел 2 'Результаты 14 глубинных интервью', п.1",
+      "metric_definition": {
+        "metric_name": "m2_retention_family_linked",
+        "numerator": "активные пользователи в месяце M2",
+        "denominator": "пользователи когорты, подключившие родственника",
+        "period": "2026-Q3",
+        "unit": "%",
+        "value": 68.4
+      },
+      "validity_status": "valid"
+    },
+    {
+      "id": "F-006",
+      "statement": "Средняя стоимость привлечения платящего абонента (CAC) составляет 485.7 руб. при ARPU 199 руб./мес.",
+      "source_refs": [
+        "S-001"
+      ],
+      "exact_locator": "billing_funnel_q3.csv, столбец cac_rub, среднее значение по строкам с данными",
+      "metric_definition": {
+        "metric_name": "cac_rub",
+        "numerator": "маркетинговые затраты",
+        "denominator": "новые платные подписки",
+        "period": "2026-Q3",
+        "unit": "RUB",
+        "value": 485.7
+      },
+      "validity_status": "valid"
+    }
+  ],
+  "calculations": [
+    {
+      "id": "C-001",
+      "description": "Расчет валовой маржи подписки при включении потокового real-time ИИ-детектора дипфейков",
+      "formula": "gross_margin_pct = (ARPU - gpu_inference_cost - billing_cost) / ARPU",
+      "depends_on": [
+        "F-003"
+      ],
+      "result_value": 12.1,
+      "unit": "%",
+      "reproduce_command": "python -c \"print(round((199 - 135 - 40) / 199 * 100, 1))\"",
+      "validity_status": "valid"
+    },
+    {
+      "id": "C-002",
+      "description": "Расчет срока окупаемости привлечения (Payback) при семейном онбординге с удержанием M2 68.4%",
+      "formula": "payback_months = CAC / (ARPU * gross_margin_rate * avg_retention_factor)",
+      "depends_on": [
+        "F-005",
+        "F-006"
+      ],
+      "result_value": 3.4,
+      "unit": "months",
+      "reproduce_command": "python -c \"print(round(485.7 / (199 * 0.76 * 0.94), 1))\"",
+      "validity_status": "valid"
+    },
+    {
+      "id": "C-003",
+      "description": "Расчет мультипликатора прироста завершения онбординга при снижении дропоффа с 77.2% до 40.0%",
+      "formula": "completion_multiplier = (1 - 0.400) / (1 - 0.772)",
+      "depends_on": [
+        "F-001",
+        "F-002",
+        "F-004"
+      ],
+      "result_value": 2.63,
+      "unit": "ratio_multiplier",
+      "reproduce_command": "python -c \"print(round((1 - 0.40) / (1 - 0.772), 2))\"",
+      "validity_status": "valid"
+    }
+  ],
+  "hypotheses": [
+    {
+      "id": "H-001",
+      "statement": "Основная причина оттока одиночных аккаунтов (M2 24.1%) — восприятие продукта как дубликата бесплатного системного антиспама в iOS/Android",
+      "kind": "hypothesis",
+      "is_synthetic_respondent": false,
+      "depends_on": [
+        "F-005"
+      ],
+      "confidence": "medium",
+      "verification_method": "A/B тест ценностного предложения в SMS-дайджесте первой недели использования",
+      "validity_status": "valid"
+    },
+    {
+      "id": "H-002",
+      "statement": "Формулировка позиционирования «Тихая сетевая защита без SMS-кодов и настроек на телефоне мамы» снимет тревогу цифрового лидера семьи и повысит завершение онбординга",
+      "kind": "synthetic_insight",
+      "is_synthetic_respondent": true,
+      "depends_on": [
+        "S-004"
+      ],
+      "confidence": "medium",
+      "verification_method": "Коридорный UX-тест онбординга с 8 пользователями сегмента 30-45 лет, имеющими пожилых родителей",
+      "validity_status": "valid"
+    },
+    {
+      "id": "H-003",
+      "statement": "Внедрение еженедельного семейного push-дайджеста о заблокированных угрозах на номерах близких удержит M3+ Retention выше 60%",
+      "kind": "forecast",
+      "is_synthetic_respondent": false,
+      "depends_on": [
+        "F-005",
+        "C-002"
+      ],
+      "confidence": "medium",
+      "verification_method": "Когортный анализ retention триалов с дайджестом и без в течение 90 дней",
+      "validity_status": "valid"
+    }
+  ],
+  "contradictions": [
+    {
+      "id": "X-001",
+      "description": "Расхождение конверсии в платную подписку за 2026-Q3: 4.2% от визитов лендинга против 18.5% от активированных триалов",
+      "conflicting_refs": [
+        "F-001",
+        "F-002"
+      ],
+      "resolution_status": "explained_by_methodology",
+      "resolution_note": "Разные знаменатели: маркетинг рассчитывает конверсию от всех уникальных посетителей лендинга (paid/landing_visitors = 4.2%), а продуктовая аналитика — от активированных триалов (paid/activated_trials = 18.5%). Числитель одинаков (8026). Усреднение некорректно (T03); обе метрики верны для своих этапов воронки."
+    }
+  ],
+  "knowledge_gaps": [
+    {
+      "id": "G-001",
+      "missing_info": "Пропуски в данных CAC и M2 Retention по регионам Urals и Siberia в выгрузке биллинга (2 недели)",
+      "why_unknown": "Временный сбой интеграции регионального биллинга при выгрузке за недели W29, W31, W33",
+      "impact_on_decision": "Незначительное влияние на федеральную модель (менее 6% строк); средневзвешенный показатель по 30 строкам достаточен для принятия решения",
+      "mitigation_or_next_step": "Использовать консервативную федеральную оценку CAC 485.7 руб.; запросить повторную выгрузку биллинга в плановом порядке"
+    },
+    {
+      "id": "G-002",
+      "missing_info": "Фактическое удержание когорт за пределами 2-го месяца (M3–M12 Retention)",
+      "why_unknown": "Сервис в обновленной версии запущен менее 4 месяцев назад, зрелые когорты M6+ еще не сформировались",
+      "impact_on_decision": "Расчет LTV ограничен горизонтом 3 месяцев; долгосрочная окупаемость опирается на консервативный прогноз",
+      "mitigation_or_next_step": "Заложить ежемесячный мониторинг когорт в validation_plan и триггеры пересмотра при отклонении M3 ниже 55%"
+    }
+  ]
+}
