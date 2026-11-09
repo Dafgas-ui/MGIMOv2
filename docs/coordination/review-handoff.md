@@ -132,3 +132,16 @@ changed_files: agent/runtime-instructions.md, knowledge/product-strategy/framewo
 verified_checks: python -m unittest discover -s tests/unit -v -> 37 tests OK; YAML frontmatter (name, description) in 4 SKILL.md -> OK; scan for dev-contour leaks (TASK-, coordination, role names) in agent/, knowledge/, skills/ -> none; CLI commands matched against strategist_cli.py --help and schemas/*.schema.json; python tools/check_coordination.py -> PASS
 limitations: CORE-03 закрыт на уровне регламента (обязательный render-outputs + log-usage в runtime-instructions и skills), не кодом; субагенты research-analyst, synthetic-respondent, strategy-auditor упоминаются, но создаются в TASK-005; E2E-прогон навыков на демо-кейсе не выполнялся (TASK-005)
 predecessor_ref: AUDIT TASK-003 (71e7ae3)
+
+
+## [AUDIT] TASK-004 — 2026-11-09 16:56
+task_id: TASK-004
+record_type: AUDIT
+author: Argon-Judge
+timestamp: 2026-11-09 16:56
+commit_hash: a343afa
+agents_md_sha256: 57bf75979bd8d3b17fef9c137c09f9b96bbf5504b8699080955c13da9c900b73
+changed_files: docs/coordination/task-board.md, docs/coordination/review-handoff.md
+verified_checks: python tools/check_coordination.py -> PASS; python -m unittest discover -s tests/unit -v -> 37 tests OK; automated scan of agent/, knowledge/, skills/ for Contour B leaks -> 0 leaks; validation of all 7 JSON examples in skills/*/SKILL.md against schemas/*.schema.json -> PASS; validation of all 31 CLI commands in skills/*/SKILL.md against strategist_cli.build_parser() -> PASS; verification of CORE-03 closure
+limitations: CORE-03 закрыт регламентно во всех 4 навыках и runtime-instructions.md. Неблокирующее замечание SKILL-01 (Low): в problem-framing/SKILL.md и runtime-instructions.md приведена команда advance-stage --to INTAKE --awaiting-human true, однако при current_stage == INTAKE функция advance_stage отклоняет переход в тот же этап (срабатывает только при rollback в INTAKE; при нахождении уже в INTAKE ожидание фиксируется в state.json — учесть в TASK-005)
+predecessor_ref: HANDOFF TASK-004 (db0ffdc)
