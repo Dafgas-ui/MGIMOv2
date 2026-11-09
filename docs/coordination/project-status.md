@@ -3,7 +3,7 @@
 **Обновлено:** 2026-11-09
 
 ## Текущий этап
-Неделя 1 — развёртывание каркаса (`TASK-000` на ревью). Далее параллельно: `TASK-001`/`TASK-002` (Opus-Core), `TASK-004` (Opus-Mind), `TASK-003` (Sonnet-Staff).
+Неделя 1 — `TASK-000` принят владельцем (`ACCEPTED`). В работе Шаг 1: `TASK-001` (`Opus-Core` — JSON-схемы состояния, графа доказательств и решений). Далее: `TASK-002` (`Opus-Core`), `TASK-003` (`Sonnet-Staff`), `TASK-004` (`Opus-Mind`).
 
 ## Целостность AGENTS.md
 agents_md_sha256: 57bf75979bd8d3b17fef9c137c09f9b96bbf5504b8699080955c13da9c900b73
