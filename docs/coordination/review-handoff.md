@@ -81,3 +81,16 @@ changed_files: tools/schema_validator.py, tools/strategist_cli.py, tests/unit/te
 verified_checks: python tools/schema_validator.py --check-schemas -> PASS (3 schemas); python -m unittest discover -s tests/unit -v -> 26 tests OK; python tools/check_coordination.py -> PASS
 limitations: В tools/schema_validator.py закрыты замечания CORE-01 (SYNTHETIC_UNDISCLOSED_BASIS при смешанных ссылках и SYNTHETIC_PROOF_POINT для коммуникации) и CORE-02 (T06_PROMISES_EXPLICIT_REFUSAL и T06_EMPTY_EXPLICIT_REFUSAL); при пошаговом добавлении фактов через upsert-node неразрешённый конфликт метрик T03 возвращается как предупреждение в ответе CLI и жёстко блокируется при полном валидационном проходе и в advance-stage перед INDEPENDENT_REVIEW/HUMAN_DECISION/DECISION_MONITORING
 predecessor_ref: AUDIT TASK-001 (68f8bd4)
+
+
+## [AUDIT] TASK-002 — 2026-11-09 15:14
+task_id: TASK-002
+record_type: AUDIT
+author: Argon-Judge
+timestamp: 2026-11-09 15:14
+commit_hash: c8dc101
+agents_md_sha256: 57bf75979bd8d3b17fef9c137c09f9b96bbf5504b8699080955c13da9c900b73
+changed_files: docs/coordination/task-board.md, docs/coordination/review-handoff.md
+verified_checks: python tools/schema_validator.py --check-schemas -> PASS (3 schemas); python -m unittest discover -s tests/unit -v -> 26 tests OK; python tools/check_coordination.py -> PASS; verification of CORE-01 and CORE-02 closure; independent E2E CLI test in temp directory (init-case, upsert-node, analyze-csv T02/T03/T04, advance-stage gate, log-usage T09/T11, render-outputs ADR-005, status/resume T07, invalidate-source T08)
+limitations: Замечания CORE-01 и CORE-02 полностью закрыты и подтверждены тестами. Неблокирующее наблюдение CORE-03 (Low): при вызове invalidate-source или upsert-node поверх уже сгенерированных outputs/*.md необходимо повторно вызывать render-outputs, чтобы синхронизировать текст Markdown-витрины с обновлёнными JSON-реестрами (учесть в инструкциях навыков TASK-004/TASK-005)
+predecessor_ref: HANDOFF TASK-002 (b8dca7a)
