@@ -1,4 +1,4 @@
-﻿# Доска задач
+# Доска задач
 
 Правило: **одна строка на один `TASK-ID`**. Статусы меняются на месте, дубли запрещены.
 
@@ -14,4 +14,4 @@
 | TASK-003 | Хук автовосстановления сессии .agents/hooks.json | Sonnet-Staff | Argon-Judge | READY_FOR_REVIEW | PASS | ACCEPTED | d6f669c | Неделя 1 |
 | TASK-004 | Оркестратор agent/runtime-instructions.md, база knowledge/ и 4 базовых навыка в skills/ | Opus-Mind | Argon-Judge | READY_FOR_REVIEW | PASS | ACCEPTED | db0ffdc | Неделя 1 |
 | TASK-005 | Продуктовые субагенты в agents/ и тренировочный кейс в projects/demo_mvp/ | Opus-Mind | Argon-Judge | READY_FOR_REVIEW | PASS | ACCEPTED | cf9eaa8 | Неделя 1 |
-| TASK-006 | Сквозные приёмочные испытания T01–T12 и релиз MVP | Argon-Judge | Argon-Prime | READY_FOR_REVIEW | PENDING | PENDING | e0de896 | Неделя 1 |
+| TASK-006 | Сквозные приёмочные испытания T01–T12 и релиз MVP | Argon-Judge | Argon-Prime | READY_FOR_REVIEW | PASS | PENDING | e0de896 | Неделя 1 |
