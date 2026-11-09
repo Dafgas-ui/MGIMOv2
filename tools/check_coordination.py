@@ -19,6 +19,20 @@ TASK_RE = re.compile(r"^TASK-\d+$")
 HEADER_RE = re.compile(r"^## \[(HANDOFF|AUDIT)\]\s+(TASK-\d+)")
 FIELD_RE = re.compile(r"^\s*(?:[-*]\s*)?(\w+)\s*:\s*(.*)$")
 
+REQUIRED_RECORD_FIELDS = (
+    "task_id",
+    "record_type",
+    "author",
+    "timestamp",
+    "commit_hash",
+    "agents_md_sha256",
+    "changed_files",
+    "verified_checks",
+    "limitations",
+    "predecessor_ref",
+)
+AUDITED_STATUSES = frozenset({"PASS", "PASS WITH WARNINGS", "FAIL"})
+
 
 def _clean(v):
     return v.strip().strip("`").strip()
@@ -109,19 +123,47 @@ def check(root):
         if n > 1:
             errors.append(f"task-board.md: дубликат task_id {tid} ({n} строк)")
 
-    # 3. Сверка с handoff
+    # 3. Сверка с handoff и audit (COORD-01)
     records = parse_handoff(_read(coord / "review-handoff.md"))
+
+    # 3.1 Валидация полноты и корректности каждой секции handoff/audit
+    for rec in records:
+        tid = rec.get("_task", "UNKNOWN")
+        rtype = rec.get("_type", "UNKNOWN")
+        for f_name in REQUIRED_RECORD_FIELDS:
+            if f_name not in rec or not rec[f_name].strip():
+                errors.append(
+                    f"review-handoff.md: {tid} [{rtype}]: отсутствует или пусто обязательное поле '{f_name}'"
+                )
+        if rec.get("task_id") != tid:
+            errors.append(
+                f"review-handoff.md: {tid} [{rtype}]: поле task_id '{rec.get('task_id')}' не совпадает с заголовком '{tid}'"
+            )
+        if rec.get("record_type") != rtype:
+            errors.append(
+                f"review-handoff.md: {tid} [{rtype}]: поле record_type '{rec.get('record_type')}' не совпадает с типом заголовка '{rtype}'"
+            )
+
+    # 3.2 Сверка задач из task-board.md
     for r in valid_rows:
-        if r["dev_status"] != "READY_FOR_REVIEW":
-            continue
         tid = r["task_id"]
-        ok = any(
-            rec["_type"] == "HANDOFF" and rec["_task"] == tid
-            and rec.get("commit_hash", "").upper() not in BAD_HASH
-            for rec in records
-        )
-        if not ok:
-            errors.append(f"{tid}: READY_FOR_REVIEW, но в review-handoff.md нет блока HANDOFF с валидным commit_hash")
+        if r["dev_status"] == "READY_FOR_REVIEW":
+            ok = any(
+                rec.get("_type") == "HANDOFF" and rec.get("_task") == tid
+                and rec.get("commit_hash", "").upper() not in BAD_HASH
+                for rec in records
+            )
+            if not ok:
+                errors.append(f"{tid}: READY_FOR_REVIEW, но в review-handoff.md нет блока HANDOFF с валидным commit_hash")
+
+        if r["audit_status"] in AUDITED_STATUSES:
+            ok_audit = any(
+                rec.get("_type") == "AUDIT" and rec.get("_task") == tid
+                and rec.get("commit_hash", "").upper() not in BAD_HASH
+                for rec in records
+            )
+            if not ok_audit:
+                errors.append(f"{tid}: audit_status равен {r['audit_status']}, но в review-handoff.md нет блока AUDIT с валидным commit_hash")
 
     # 4. Хэш AGENTS.md
     actual = hashlib.sha256(agents.read_bytes()).hexdigest()

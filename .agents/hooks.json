@@ -1,0 +1,12 @@
+{
+  "session-state-recovery": {
+    "enabled": true,
+    "SessionStart": [
+      {
+        "type": "command",
+        "command": "python ../tools/session_recovery_hook.py",
+        "timeout": 10
+      }
+    ]
+  }
+}
