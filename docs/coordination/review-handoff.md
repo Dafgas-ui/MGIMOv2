@@ -68,3 +68,16 @@ changed_files: docs/coordination/task-board.md, docs/coordination/review-handoff
 verified_checks: python tools/schema_validator.py --check-schemas -> PASS (3 schemas); python -m unittest discover -s tests/unit -v -> 20 tests OK; python tools/check_coordination.py -> PASS; boundary probes on 3-node cycles, T03, T05, T06, T08, T09, T11 and synthetic respondent guards
 limitations: Схемы schemas/*.schema.json без замечаний. Неблокирующие замечания к бизнес-инвариантам tools/schema_validator.py для закрытия в TASK-002: CORE-01 (Medium — не проверяется нераскрытый синтетический респондент при наличии хотя бы одного F/C в product_strategy.evidence_refs и не блокируется proof_point, опирающийся только на синтетического респондента), CORE-02 (Low — T06 проверяет флаг consistency_check.is_consistent и ссылки на P-xxx, но не сверяет тексты proof_points/key_message с массивом explicit_refusals)
 predecessor_ref: HANDOFF TASK-001 (c2b3aca)
+
+
+## [HANDOFF] TASK-002 — 2026-11-09 14:04
+task_id: TASK-002
+record_type: HANDOFF
+author: Opus-Core
+timestamp: 2026-11-09 14:04
+commit_hash: b8dca7a
+agents_md_sha256: 57bf75979bd8d3b17fef9c137c09f9b96bbf5504b8699080955c13da9c900b73
+changed_files: tools/schema_validator.py, tools/strategist_cli.py, tests/unit/test_schemas.py, tests/unit/test_strategist_cli.py, docs/coordination/task-board.md, docs/coordination/review-handoff.md
+verified_checks: python tools/schema_validator.py --check-schemas -> PASS (3 schemas); python -m unittest discover -s tests/unit -v -> 26 tests OK; python tools/check_coordination.py -> PASS
+limitations: В tools/schema_validator.py закрыты замечания CORE-01 (SYNTHETIC_UNDISCLOSED_BASIS при смешанных ссылках и SYNTHETIC_PROOF_POINT для коммуникации) и CORE-02 (T06_PROMISES_EXPLICIT_REFUSAL и T06_EMPTY_EXPLICIT_REFUSAL); при пошаговом добавлении фактов через upsert-node неразрешённый конфликт метрик T03 возвращается как предупреждение в ответе CLI и жёстко блокируется при полном валидационном проходе и в advance-stage перед INDEPENDENT_REVIEW/HUMAN_DECISION/DECISION_MONITORING
+predecessor_ref: AUDIT TASK-001 (68f8bd4)
