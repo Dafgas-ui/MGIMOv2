@@ -3,7 +3,7 @@
 **Обновлено:** 2026-11-09
 
 ## Текущий этап
-Неделя 1 — `TASK-000`, `TASK-001` и `TASK-002` приняты владельцем (`ACCEPTED`). В работе завершение Шага 2: `TASK-003` (`Sonnet-Staff` — хук автовосстановления `.agents/hooks.json`, `tools/session_recovery_hook.py` и закрытие `COORD-01`). Далее Шаг 3: `TASK-004` (`Opus-Mind`).
+Неделя 1 — `TASK-000`, `TASK-001`, `TASK-002` и `TASK-003` приняты владельцем (`ACCEPTED`, Шаги 0, 1 и 2 полностью завершены). В работе Шаг 3: `TASK-004` (`Opus-Mind` — оркестратор `agent/runtime-instructions.md`, база `knowledge/` и 4 базовых навыка в `skills/`). Далее Шаг 4: `TASK-005` (`Opus-Mind`).
 
 ## Целостность AGENTS.md
 agents_md_sha256: 57bf75979bd8d3b17fef9c137c09f9b96bbf5504b8699080955c13da9c900b73
