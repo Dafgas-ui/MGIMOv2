@@ -171,3 +171,16 @@ changed_files: docs/coordination/task-board.md, docs/coordination/review-handoff
 verified_checks: python tools/schema_validator.py --case projects/demo_mvp --strict -> PASS (0 errors, 0 warnings); python tools/strategist_cli.py status --case projects/demo_mvp -> PASS (stage DECISION_MONITORING, 6 tracked artifacts OK); python tools/session_recovery_hook.py --test-case projects/demo_mvp -> OK; python tools/strategist_cli.py analyze-csv on S-001/S-002 -> verified F-001 (4.20%), F-002 (18.50%), F-006 (485.7 RUB), G-001 (2/32 missing in cac_rub and m2_retention_pct), X-001 (METRIC_DEFINITION_CONFLICT); verified SHA-256 of S-001..S-004, reproduce_command of C-001..C-003 (12.1, 3.4, 2.63), and byte-identical render-outputs on outputs/01..04.md; verified SKILL-01 closure, T10 prompt injection neutralization in S-003, and 0 Contour B leaks across 21 files; python -m unittest discover -s tests/unit -v -> 37 tests OK; python tools/check_coordination.py -> PASS
 limitations: Замечание SKILL-01 полностью закрыто. Точечная правка изоляции subprocess-вызова (--test-case) в tests/unit/test_session_recovery_hook.py обоснована появлением реального кейса projects/demo_mvp/state.json и прозрачно задекларирована в handoff (HOOK-01). Блокирующих и неблокирующих замечаний нет
 predecessor_ref: HANDOFF TASK-005 (cf9eaa8)
+
+
+## [HANDOFF] TASK-006 — 2026-11-09 18:20
+task_id: TASK-006
+record_type: HANDOFF
+author: Argon-Judge
+timestamp: 2026-11-09 18:20
+commit_hash: e0de896
+agents_md_sha256: 57bf75979bd8d3b17fef9c137c09f9b96bbf5504b8699080955c13da9c900b73
+changed_files: tests/scenarios/__init__.py, tests/scenarios/test_acceptance_t01_t12.py, docs/coordination/task-board.md, docs/coordination/review-handoff.md
+verified_checks: python -m unittest discover -s tests/unit -v -> 37 tests OK; python -m unittest discover -s tests/scenarios -v -> 12 tests OK (T01..T12); python -m unittest discover -s tests -v -> 49 tests OK; python tools/schema_validator.py --check-schemas -> PASS (3 schemas); python tools/schema_validator.py --case projects/demo_mvp --strict -> PASS (0 errors, 0 warnings); python tools/check_coordination.py -> PASS
+limitations: Сквозные приёмочные сценарии T01–T12 реализованы на стандартной библиотеке Python без внешних зависимостей и сетевых вызовов; аудит и финальное утверждение TASK-006 выполняются куратором Argon-Prime
+predecessor_ref: AUDIT TASK-005 (a312184)
