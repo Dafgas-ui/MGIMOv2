@@ -1,0 +1,254 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mgimov3.local/schemas/state.schema.json",
+  "title": "Case State — постановка задачи, рабочий процесс, контрольные точки и учёт затрат",
+  "description": "Контракт файла projects/<case>/state.json. Покрывает FR-01 (постановка задачи), FR-09 (workflow), FR-10 (продолжение после перерыва), FR-11 (прозрачность затрат), FR-12 (подключение человека), T01, T07, T09, T11. Согласованность итогов, переходов и операций проверяет tools/schema_validator.py.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "case_id",
+    "schema_version",
+    "created_at",
+    "updated_at",
+    "problem_framing",
+    "workflow",
+    "checkpoints_and_recovery",
+    "cost_and_usage_ledger"
+  ],
+  "properties": {
+    "case_id": { "$ref": "#/$defs/case_id" },
+    "schema_version": { "$ref": "#/$defs/schema_version" },
+    "created_at": { "$ref": "#/$defs/timestamp" },
+    "updated_at": { "$ref": "#/$defs/timestamp" },
+    "problem_framing": { "$ref": "#/$defs/problem_framing" },
+    "workflow": { "$ref": "#/$defs/workflow" },
+    "checkpoints_and_recovery": { "$ref": "#/$defs/checkpoints_and_recovery" },
+    "cost_and_usage_ledger": { "$ref": "#/$defs/cost_and_usage_ledger" }
+  },
+  "$defs": {
+    "case_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9_-]{0,63}$"
+    },
+    "schema_version": {
+      "type": "string",
+      "pattern": "^1\\.[0-9]+$"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "non_empty_string": {
+      "type": "string",
+      "minLength": 1
+    },
+    "nullable_text": {
+      "description": "null — ещё не уточнено.",
+      "anyOf": [{ "$ref": "#/$defs/non_empty_string" }, { "type": "null" }]
+    },
+    "stage": {
+      "enum": [
+        "INTAKE",
+        "RESEARCH_PLANNING",
+        "EVIDENCE_COLLECTION",
+        "EVIDENCE_VALIDATION",
+        "OPTIONS_GENERATION",
+        "STRATEGY_DESIGN",
+        "INDEPENDENT_REVIEW",
+        "HUMAN_DECISION",
+        "DECISION_MONITORING"
+      ]
+    },
+    "clarifying_question": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["question", "why_critical_for_next_step"],
+      "properties": {
+        "question": { "$ref": "#/$defs/non_empty_string" },
+        "why_critical_for_next_step": {
+          "description": "Обоснование, почему без ответа нельзя сделать следующий шаг (спрашиваем только важное).",
+          "$ref": "#/$defs/non_empty_string"
+        }
+      }
+    },
+    "problem_framing": {
+      "description": "FR-01, T01: вопрос, цель, получатель, ограничения, доступные данные. После INTAKE clarified_problem, goal и decision_recipient обязаны быть заполнены.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "raw_request",
+        "clarified_problem",
+        "goal",
+        "decision_recipient",
+        "constraints",
+        "available_data_summary",
+        "pending_clarifying_questions"
+      ],
+      "properties": {
+        "raw_request": { "$ref": "#/$defs/non_empty_string" },
+        "clarified_problem": { "$ref": "#/$defs/nullable_text" },
+        "goal": { "$ref": "#/$defs/nullable_text" },
+        "decision_recipient": { "$ref": "#/$defs/nullable_text" },
+        "constraints": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/non_empty_string" }
+        },
+        "available_data_summary": { "$ref": "#/$defs/nullable_text" },
+        "pending_clarifying_questions": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/clarifying_question" }
+        }
+      }
+    },
+    "stage_transition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["from_stage", "to_stage", "timestamp", "transition_type", "reason"],
+      "properties": {
+        "from_stage": { "anyOf": [{ "$ref": "#/$defs/stage" }, { "type": "null" }] },
+        "to_stage": { "$ref": "#/$defs/stage" },
+        "timestamp": { "$ref": "#/$defs/timestamp" },
+        "transition_type": {
+          "description": "start — первый вход; forward — к следующему этапу; rollback — возврат при новых данных/ошибке.",
+          "enum": ["start", "forward", "rollback"]
+        },
+        "reason": { "$ref": "#/$defs/non_empty_string" }
+      }
+    },
+    "workflow": {
+      "description": "FR-09, FR-12: этапы от запроса до сопровождения решения, подключение человека при существенном выборе.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["current_stage", "completed_stages", "stage_history", "awaiting_human_approval"],
+      "properties": {
+        "current_stage": { "$ref": "#/$defs/stage" },
+        "completed_stages": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/stage" }
+        },
+        "stage_history": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/stage_transition" }
+        },
+        "awaiting_human_approval": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["is_awaiting", "reason"],
+          "properties": {
+            "is_awaiting": { "type": "boolean" },
+            "reason": {
+              "description": "Причина остановки для человека; обязательна при is_awaiting=true.",
+              "type": ["string", "null"]
+            }
+          }
+        }
+      }
+    },
+    "operation": {
+      "description": "T09: незавершённая операция — для безопасного возобновления без повтора платных/тяжёлых шагов.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["operation_id", "started_at", "actor_or_tool", "is_paid_or_heavy", "status", "resume_hint"],
+      "properties": {
+        "operation_id": { "$ref": "#/$defs/non_empty_string" },
+        "started_at": { "$ref": "#/$defs/timestamp" },
+        "actor_or_tool": { "$ref": "#/$defs/non_empty_string" },
+        "idempotency_key": { "type": ["string", "null"] },
+        "is_paid_or_heavy": { "type": "boolean" },
+        "status": { "enum": ["running", "interrupted", "failed"] },
+        "resume_hint": { "$ref": "#/$defs/non_empty_string" },
+        "error": { "type": ["string", "null"] }
+      }
+    },
+    "artifact_hash": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256", "recorded_at"],
+      "properties": {
+        "path": {
+          "description": "Путь относительно каталога кейса, через '/'. Абсолютные пути и '..' запрещены (проверяет валидатор: UNSAFE_PATH).",
+          "type": "string",
+          "minLength": 1
+        },
+        "sha256": {
+          "description": "SHA-256 содержимого файла с нормализацией CRLF->LF (см. artifact_sha256 в tools/schema_validator.py).",
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "recorded_at": { "$ref": "#/$defs/timestamp" }
+      }
+    },
+    "checkpoints_and_recovery": {
+      "description": "FR-10, T07, T09: место продолжения и целостность артефактов.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["last_completed_operation_id", "in_progress_operation", "artifacts_integrity"],
+      "properties": {
+        "last_completed_operation_id": { "type": ["string", "null"] },
+        "in_progress_operation": {
+          "anyOf": [{ "$ref": "#/$defs/operation" }, { "type": "null" }]
+        },
+        "artifacts_integrity": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/artifact_hash" }
+        }
+      }
+    },
+    "ledger_entry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "step_id",
+        "timestamp",
+        "actor_or_tool",
+        "model_tier",
+        "duration_sec",
+        "tokens_in",
+        "tokens_out",
+        "estimated_cost_usd",
+        "is_estimated"
+      ],
+      "properties": {
+        "step_id": { "$ref": "#/$defs/non_empty_string" },
+        "timestamp": { "$ref": "#/$defs/timestamp" },
+        "actor_or_tool": { "$ref": "#/$defs/non_empty_string" },
+        "model_tier": {
+          "description": "none — детерминированный инструмент; human — работа человека.",
+          "enum": ["none", "light", "standard", "heavy", "human"]
+        },
+        "duration_sec": { "type": "number", "minimum": 0 },
+        "tokens_in": { "type": "integer", "minimum": 0 },
+        "tokens_out": { "type": "integer", "minimum": 0 },
+        "estimated_cost_usd": { "type": "number", "minimum": 0 },
+        "is_estimated": {
+          "description": "true — значения оценочные (нет точного биллинга).",
+          "type": "boolean"
+        },
+        "notes": { "type": ["string", "null"] }
+      }
+    },
+    "cost_and_usage_ledger": {
+      "description": "FR-11, T11: журнал затрат; totals обязаны совпадать с суммой entries.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["entries", "totals"],
+      "properties": {
+        "entries": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/ledger_entry" }
+        },
+        "totals": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["total_duration_sec", "total_tokens", "total_estimated_cost_usd"],
+          "properties": {
+            "total_duration_sec": { "type": "number", "minimum": 0 },
+            "total_tokens": { "type": "integer", "minimum": 0 },
+            "total_estimated_cost_usd": { "type": "number", "minimum": 0 }
+          }
+        }
+      }
+    }
+  }
+}

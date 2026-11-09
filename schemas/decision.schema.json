@@ -1,0 +1,345 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mgimov3.local/schemas/decision.schema.json",
+  "title": "Strategy Decision — альтернативы, стратегии, план проверки и сопровождение решения",
+  "description": "Контракт файла projects/<case>/decisions/strategy_decision.json. Покрывает FR-05 (варианты и возражения), FR-06 (продуктовая стратегия), FR-07 (коммуникационная стратегия), FR-08 (план проверки), T05, T06, T08. Разделы стратегии могут отсутствовать только при decision_status=draft; кросс-проверки со ссылками на граф доказательств выполняет tools/schema_validator.py.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["case_id", "schema_version", "updated_at", "decision_status", "alternatives"],
+  "properties": {
+    "case_id": { "$ref": "#/$defs/case_id" },
+    "schema_version": { "$ref": "#/$defs/schema_version" },
+    "updated_at": { "$ref": "#/$defs/timestamp" },
+    "decision_status": {
+      "description": "draft — в работе; audited — прошло независимую проверку; approved_by_human — утверждено человеком; needs_reassessment — основания устарели (T08).",
+      "enum": ["draft", "audited", "approved_by_human", "needs_reassessment"]
+    },
+    "alternatives": {
+      "description": "FR-05, T05: не меньше трёх содержательно разных вариантов; обязательно status_quo и sunset_or_close.",
+      "type": "array",
+      "minItems": 3,
+      "items": { "$ref": "#/$defs/alternative" }
+    },
+    "product_strategy": { "$ref": "#/$defs/product_strategy" },
+    "communication_strategy": { "$ref": "#/$defs/communication_strategy" },
+    "validation_plan": { "$ref": "#/$defs/validation_plan" },
+    "decision_support_and_reassessment": { "$ref": "#/$defs/decision_support_and_reassessment" }
+  },
+  "$defs": {
+    "case_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9_-]{0,63}$"
+    },
+    "schema_version": {
+      "type": "string",
+      "pattern": "^1\\.[0-9]+$"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "non_empty_string": {
+      "type": "string",
+      "minLength": 1
+    },
+    "non_empty_string_list": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/non_empty_string" }
+    },
+    "evidence_ref": {
+      "description": "Ссылка на узел графа доказательств: факт, расчёт или гипотеза.",
+      "type": "string",
+      "pattern": "^[FCH]-[0-9]{3,}$"
+    },
+    "evidence_ref_list": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": { "$ref": "#/$defs/evidence_ref" }
+    },
+    "graph_node_ref": {
+      "description": "Ссылка на любой узел графа доказательств.",
+      "type": "string",
+      "pattern": "^[QSFCHXG]-[0-9]{3,}$"
+    },
+    "alternative": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "title", "option_type", "summary", "supporting_refs", "strong_objections", "expected_economics", "verdict"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^O-[0-9]{3,}$" },
+        "title": { "$ref": "#/$defs/non_empty_string" },
+        "option_type": { "enum": ["status_quo", "sunset_or_close", "strategic_direction"] },
+        "summary": { "$ref": "#/$defs/non_empty_string" },
+        "supporting_refs": { "$ref": "#/$defs/evidence_ref_list" },
+        "strong_objections": {
+          "description": "Сильные возражения против варианта — непустой список.",
+          "$ref": "#/$defs/non_empty_string_list"
+        },
+        "expected_economics": { "$ref": "#/$defs/non_empty_string" },
+        "verdict": { "enum": ["selected", "rejected", "fallback"] }
+      }
+    },
+    "competing_alternative": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "alternative_type"],
+      "properties": {
+        "name": { "$ref": "#/$defs/non_empty_string" },
+        "alternative_type": {
+          "description": "habitual_free_workaround — привычный бесплатный способ решить задачу; do_nothing — ничего не делать.",
+          "enum": ["direct_competitor", "substitute", "habitual_free_workaround", "do_nothing"]
+        },
+        "notes": { "type": ["string", "null"] }
+      }
+    },
+    "key_capability": {
+      "description": "Реальное свойство продукта, на которое может опираться коммуникация (T06).",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "description"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^P-[0-9]{3,}$" },
+        "description": { "$ref": "#/$defs/non_empty_string" }
+      }
+    },
+    "assumption": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "statement", "related_refs"],
+      "properties": {
+        "kind": {
+          "description": "synthetic_respondent_basis — явная пометка, что основанием служат ответы модельных респондентов.",
+          "enum": ["hypothesis_basis", "synthetic_respondent_basis", "knowledge_gap", "scope_limit"]
+        },
+        "statement": { "$ref": "#/$defs/non_empty_string" },
+        "related_refs": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/graph_node_ref" }
+        }
+      }
+    },
+    "product_strategy": {
+      "description": "FR-06: аудитория и задача, альтернативы, направление, осознанные отказы, связь пользы с затратами и доходами.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "selected_option_id",
+        "target_audience",
+        "user_job_to_be_done",
+        "competing_alternatives",
+        "chosen_direction",
+        "key_capabilities",
+        "explicit_refusals",
+        "cost_drivers",
+        "revenue_or_value_logic",
+        "unit_economics_link",
+        "evidence_refs",
+        "assumptions_and_limits"
+      ],
+      "properties": {
+        "selected_option_id": { "type": "string", "pattern": "^O-[0-9]{3,}$" },
+        "target_audience": { "$ref": "#/$defs/non_empty_string" },
+        "user_job_to_be_done": { "$ref": "#/$defs/non_empty_string" },
+        "competing_alternatives": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/competing_alternative" }
+        },
+        "chosen_direction": { "$ref": "#/$defs/non_empty_string" },
+        "key_capabilities": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/key_capability" }
+        },
+        "explicit_refusals": {
+          "description": "Осознанные отказы — что продукт НЕ делает.",
+          "$ref": "#/$defs/non_empty_string_list"
+        },
+        "cost_drivers": { "$ref": "#/$defs/non_empty_string_list" },
+        "revenue_or_value_logic": { "$ref": "#/$defs/non_empty_string" },
+        "unit_economics_link": {
+          "description": "Связь с юнит-экономикой; упомянутые идентификаторы C-xxx/F-xxx должны существовать в графе.",
+          "$ref": "#/$defs/non_empty_string"
+        },
+        "evidence_refs": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/evidence_ref" }
+        },
+        "assumptions_and_limits": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/assumption" }
+        }
+      }
+    },
+    "proof_point": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["promise", "product_capability_ref", "evidence_refs"],
+      "properties": {
+        "promise": { "$ref": "#/$defs/non_empty_string" },
+        "product_capability_ref": {
+          "description": "Ссылка на key_capabilities[].id продуктовой стратегии.",
+          "type": "string",
+          "pattern": "^P-[0-9]{3,}$"
+        },
+        "evidence_refs": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/evidence_ref" }
+        }
+      }
+    },
+    "channel": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["channel", "funnel_role"],
+      "properties": {
+        "channel": { "$ref": "#/$defs/non_empty_string" },
+        "funnel_role": { "enum": ["awareness", "consideration", "conversion", "onboarding", "retention", "advocacy"] },
+        "notes": { "type": ["string", "null"] }
+      }
+    },
+    "communication_strategy": {
+      "description": "FR-07, T06: аудитория и ситуация, барьер, ключевое сообщение и его подтверждение, роль каналов. Обещания соответствуют продукту.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "target_audience_and_context",
+        "comprehension_or_choice_barrier",
+        "key_message",
+        "proof_points",
+        "channels_and_roles",
+        "consistency_check"
+      ],
+      "properties": {
+        "target_audience_and_context": { "$ref": "#/$defs/non_empty_string" },
+        "comprehension_or_choice_barrier": { "$ref": "#/$defs/non_empty_string" },
+        "key_message": { "$ref": "#/$defs/non_empty_string" },
+        "proof_points": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/proof_point" }
+        },
+        "channels_and_roles": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/channel" }
+        },
+        "consistency_check": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["is_consistent", "explanation"],
+          "properties": {
+            "is_consistent": {
+              "description": "Должно быть true: коммуникация не обещает ничего из explicit_refusals.",
+              "type": "boolean"
+            },
+            "explanation": { "$ref": "#/$defs/non_empty_string" }
+          }
+        }
+      }
+    },
+    "metric": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["metric_name", "definition", "target"],
+      "properties": {
+        "metric_name": { "$ref": "#/$defs/non_empty_string" },
+        "definition": { "$ref": "#/$defs/non_empty_string" },
+        "target": { "$ref": "#/$defs/non_empty_string" },
+        "unit": { "type": ["string", "null"] }
+      }
+    },
+    "guardrail": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["consequence", "guardrail_metric"],
+      "properties": {
+        "consequence": { "$ref": "#/$defs/non_empty_string" },
+        "guardrail_metric": { "$ref": "#/$defs/non_empty_string" },
+        "threshold": { "type": ["string", "null"] }
+      }
+    },
+    "validation_plan": {
+      "description": "FR-08: ожидаемое изменение, с чем сравниваем, срок наблюдения, нежелательные последствия.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["expected_change", "primary_metrics", "baseline_comparison", "observation_period", "guardrail_and_negative_consequences"],
+      "properties": {
+        "expected_change": { "$ref": "#/$defs/non_empty_string" },
+        "primary_metrics": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/metric" }
+        },
+        "baseline_comparison": { "$ref": "#/$defs/non_empty_string" },
+        "observation_period": { "$ref": "#/$defs/non_empty_string" },
+        "guardrail_and_negative_consequences": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/guardrail" }
+        }
+      }
+    },
+    "commitment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "owner_role", "action", "due_date", "checkpoint", "status"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^K-[0-9]{3,}$" },
+        "owner_role": {
+          "description": "Роль ответственного (без персональных данных).",
+          "$ref": "#/$defs/non_empty_string"
+        },
+        "action": { "$ref": "#/$defs/non_empty_string" },
+        "due_date": { "type": "string", "format": "date" },
+        "checkpoint": { "$ref": "#/$defs/non_empty_string" },
+        "status": { "enum": ["planned", "in_progress", "done", "overdue", "cancelled"] }
+      }
+    },
+    "reassessment_trigger": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "condition", "watched_refs"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^R-[0-9]{3,}$" },
+        "condition": { "$ref": "#/$defs/non_empty_string" },
+        "metric_name": { "type": ["string", "null"] },
+        "threshold": { "type": ["string", "null"] },
+        "watched_refs": {
+          "description": "Узлы графа (S/G/F/C/H/...), изменение которых запускает пересмотр.",
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/graph_node_ref" }
+        }
+      }
+    },
+    "decision_support_and_reassessment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["commitments", "reassessment_triggers", "affected_by_stale_nodes"],
+      "properties": {
+        "commitments": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/commitment" }
+        },
+        "reassessment_triggers": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/reassessment_trigger" }
+        },
+        "affected_by_stale_nodes": {
+          "description": "T08: узлы графа в needs_reassessment/invalidated (или отозванные источники), на которые опирается решение.",
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/graph_node_ref" }
+        }
+      }
+    }
+  }
+}
