@@ -158,3 +158,16 @@ changed_files: agent/runtime-instructions.md, skills/problem-framing/SKILL.md, a
 verified_checks: python tools/schema_validator.py --case projects/demo_mvp --strict -> PASS (0 errors, 0 warnings); python tools/strategist_cli.py status --case projects/demo_mvp -> PASS (stage DECISION_MONITORING, 6 tracked artifacts OK, 0 stale nodes); python tools/session_recovery_hook.py --test-case projects/demo_mvp -> OK (systemMessage recovery summary); python -m unittest discover -s tests/unit -v -> 37 tests OK; automated scan for Contour B leaks in runtime dirs -> 0 leaks; closure of SKILL-01; prompt injection isolation verified in S-003 (T10); metric denominator conflict verified in F-001/F-002/X-001 (T03); data gaps verified in G-001/G-002 (T04); synthetic respondent guard verified in H-002 and assumptions_and_limits (CORE-01, T06); python tools/check_coordination.py -> PASS
 limitations: В тесте test_session_recovery_hook.py (test_02) скорректирован вызов subprocess с передачей изолированного --test-case, так как при появлении реального state.json в projects/demo_mvp вызов хука без аргументов закономерно обнаруживает демо-кейс репозитория (HOOK-01); демо-кейс находится на этапе DECISION_MONITORING с approved_by_human (финальное состояние полного цикла); в сценарии T08 проверка каскадной инвалидации выполняется независимым аудитором в TASK-006
 predecessor_ref: AUDIT TASK-004 (015130c)
+
+
+## [AUDIT] TASK-005 — 2026-11-09 17:55
+task_id: TASK-005
+record_type: AUDIT
+author: Argon-Judge
+timestamp: 2026-11-09 17:55
+commit_hash: d37ded7
+agents_md_sha256: 57bf75979bd8d3b17fef9c137c09f9b96bbf5504b8699080955c13da9c900b73
+changed_files: docs/coordination/task-board.md, docs/coordination/review-handoff.md
+verified_checks: python tools/schema_validator.py --case projects/demo_mvp --strict -> PASS (0 errors, 0 warnings); python tools/strategist_cli.py status --case projects/demo_mvp -> PASS (stage DECISION_MONITORING, 6 tracked artifacts OK); python tools/session_recovery_hook.py --test-case projects/demo_mvp -> OK; python tools/strategist_cli.py analyze-csv on S-001/S-002 -> verified F-001 (4.20%), F-002 (18.50%), F-006 (485.7 RUB), G-001 (2/32 missing in cac_rub and m2_retention_pct), X-001 (METRIC_DEFINITION_CONFLICT); verified SHA-256 of S-001..S-004, reproduce_command of C-001..C-003 (12.1, 3.4, 2.63), and byte-identical render-outputs on outputs/01..04.md; verified SKILL-01 closure, T10 prompt injection neutralization in S-003, and 0 Contour B leaks across 21 files; python -m unittest discover -s tests/unit -v -> 37 tests OK; python tools/check_coordination.py -> PASS
+limitations: Замечание SKILL-01 полностью закрыто. Точечная правка изоляции subprocess-вызова (--test-case) в tests/unit/test_session_recovery_hook.py обоснована появлением реального кейса projects/demo_mvp/state.json и прозрачно задекларирована в handoff (HOOK-01). Блокирующих и неблокирующих замечаний нет
+predecessor_ref: HANDOFF TASK-005 (cf9eaa8)
