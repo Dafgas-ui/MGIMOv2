@@ -15,4 +15,4 @@
 | TASK-004 | Оркестратор agent/runtime-instructions.md, база knowledge/ и 4 базовых навыка в skills/ | Opus-Mind | Argon-Judge | READY_FOR_REVIEW | PASS | ACCEPTED | db0ffdc | Неделя 1 |
 | TASK-005 | Продуктовые субагенты в agents/ и тренировочный кейс в projects/demo_mvp/ | Opus-Mind | Argon-Judge | READY_FOR_REVIEW | PASS | ACCEPTED | cf9eaa8 | Неделя 1 |
 | TASK-006 | Сквозные приёмочные испытания T01–T12 и релиз MVP | Argon-Judge | Argon-Prime | READY_FOR_REVIEW | PASS | ACCEPTED | e0de896 | Неделя 1 |
-| TASK-007 | Устранение замечаний аудита: локализация поиска источников, метаданные отчетов, синхронизация версий | Opus-Core | Argon-Judge | READY_FOR_REVIEW | PASS | ACCEPTED | v0.1.1-hotfix | Хотфикс v0.1.1 |
+| TASK-007 | Устранение замечаний аудита: локализация поиска источников, метаданные отчетов, синхронизация версий | Opus-Core | Argon-Judge | READY_FOR_REVIEW | PENDING | PENDING | a6dba09 | Хотфикс v0.1.1 |
