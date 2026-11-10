@@ -51,7 +51,7 @@ def now_iso():
 def write_json(path, data):
     path = Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    path.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n", encoding="utf-8", newline="\n")
 
 
 def _parse_bool(val):
@@ -1011,11 +1011,20 @@ def log_usage(case_dir, step_id, actor, model_tier="none", duration_sec=0.0,
 # 7. render-outputs (ADR-005)
 # ---------------------------------------------------------------------------
 
+REPORT_SYNTHETIC_DISCLAIMER = (
+    "> [!NOTE]\n"
+    "> Данный отчёт сформирован на базе учебного демонстрационного кейса (Synthetic Benchmark). "
+    "Источник интервью S-004 и метрики удержания являются смоделированными для соревновательного MVP "
+    "и не отражают закрытые коммерческие данные МегаФона."
+)
+
 
 def _render_01_research_and_evidence(state, graph):
     pf = sv._dict(state, "problem_framing") or {}
     lines = [
         f"# 1. Постановка задачи и граф доказательств (`{state.get('case_id')}`)",
+        "",
+        REPORT_SYNTHETIC_DISCLAIMER,
         "",
         "## 1.1. Постановка задачи (Problem Framing)",
         f"- **Исходный запрос:** {pf.get('raw_request') or '—'}",
@@ -1117,6 +1126,8 @@ def _render_02_alternatives_comparison(decision):
     lines = [
         f"# 2. Сравнение стратегических альтернатив (`{decision.get('case_id')}`)",
         "",
+        REPORT_SYNTHETIC_DISCLAIMER,
+        "",
         f"**Статус решения:** `{decision.get('decision_status')}`",
         "",
     ]
@@ -1141,12 +1152,18 @@ def _render_03_product_and_comm_strategy(decision):
     lines = [
         f"# 3. Продуктовая и коммуникационная стратегии (`{decision.get('case_id')}`)",
         "",
+        REPORT_SYNTHETIC_DISCLAIMER,
+        "",
     ]
     if ps is None:
         lines.append("_Продуктовая стратегия находится в статусе черновика и ещё не заполнена._")
     else:
         lines.extend([
             "## 3.1. Продуктовая стратегия (`product_strategy`)",
+            "",
+            "> [!NOTE]",
+            "> Факты F-004 и F-005 подтверждают проблему текущего процесса (барьеры ручной настройки и разрыв удержания в текущем продукте). Новые функции (P-001..P-003) являются целевым продуктовым концептом и проверяемой гипотезой, ценность которой подлежит валидации на этапе пилота (описанном в 04_validation_plan_and_governance.md).",
+            "",
             f"- **Выбранная альтернатива:** `{ps.get('selected_option_id')}`",
             f"- **Целевая аудитория:** {ps.get('target_audience')}",
             f"- **Задача пользователя (JTBD):** {ps.get('user_job_to_be_done')}",
@@ -1211,6 +1228,8 @@ def _render_04_validation_and_governance(state, graph, decision):
     stale_nodes = [nid for nid in idx.nodes if idx.is_stale(nid)]
     lines = [
         f"# 4. План проверки, сопровождение решения и экономика работы (`{state.get('case_id')}`)",
+        "",
+        REPORT_SYNTHETIC_DISCLAIMER,
         "",
         f"- **Текущий этап workflow:** `{state.get('workflow', {}).get('current_stage')}`",
         f"- **Статус решения:** `{decision.get('decision_status')}`",
@@ -1281,6 +1300,10 @@ def _render_04_validation_and_governance(state, graph, decision):
             f"{e.get('duration_sec')}s, in={e.get('tokens_in')}, out={e.get('tokens_out')}, "
             f"${e.get('estimated_cost_usd')} ({est})"
         )
+    lines.extend([
+        "",
+        "*Расчётная модельная оценка полного прогона пайплайна (Model Benchmark Estimate на профиле Gemini/Claude), первичные тайминги отдельных вызовов калиброваны по тестовым прогонам.*",
+    ])
     return "\n".join(lines) + "\n"
 
 
@@ -1300,7 +1323,7 @@ def render_outputs(case_dir):
     for rel, content in docs.items():
         out_path = case_dir / rel
         out_path.parent.mkdir(parents=True, exist_ok=True)
-        out_path.write_text(content, encoding="utf-8")
+        out_path.write_text(content, encoding="utf-8", newline="\n")
 
     records = refresh_artifacts_integrity(case_dir, state=state)
     return {"rendered_files": list(OUTPUT_FILES), "artifacts_integrity": records}

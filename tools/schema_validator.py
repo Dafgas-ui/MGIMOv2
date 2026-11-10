@@ -1377,6 +1377,51 @@ def validate_case(case_dir, strict=False, schemas=None):
                                     f"хэш артефакта {rel} изменился после контрольной точки "
                                     f"(записан {expected[:12]}…, фактически {actual[:12]}…)",
                                     f"{path}/sha256", CASE_FILES["state"], "WARNING"))
+
+    if isinstance(graph, dict):
+        base = case_dir.resolve()
+        repo_root = base
+        cur = base
+        while cur.parent != cur:
+            if (cur / "AGENTS.md").is_file():
+                repo_root = cur
+                break
+            cur = cur.parent
+
+        for i, s in _iter_nodes(graph, "sources"):
+            loc = s.get("location")
+            if not isinstance(loc, str) or not loc.strip():
+                continue
+            if loc.startswith("http://") or loc.startswith("https://"):
+                continue
+
+            target = None
+            cand_paths = [case_dir / loc]
+            if loc.startswith("projects/"):
+                cand_paths.append(repo_root / loc)
+                parts = loc.split("/", 2)
+                if len(parts) == 3:
+                    cand_paths.append(case_dir / parts[2])
+            elif loc.startswith(f"{case_dir.name}/"):
+                cand_paths.append(case_dir / loc[len(case_dir.name) + 1:])
+
+            for cp in cand_paths:
+                if cp.is_file():
+                    target = cp
+                    break
+
+            if target is None:
+                issues.append(Issue("SOURCE_FILE_MISSING", f"файл источника {loc} не найден",
+                                    f"/sources/{i}/location", CASE_FILES["evidence"]))
+            else:
+                expected = s.get("content_hash")
+                if expected:
+                    actual = "sha256:" + artifact_sha256(target)
+                    if actual != expected.lower():
+                        issues.append(Issue("SOURCE_HASH_MISMATCH",
+                                            f"хэш источника {s.get('id')} ({loc}) не совпадает с content_hash: "
+                                            f"ожидался {expected}, вычислен {actual}",
+                                            f"/sources/{i}/content_hash", CASE_FILES["evidence"], "WARNING"))
     if strict:
         for issue in issues:
             if issue.severity == "WARNING":

@@ -36,6 +36,12 @@ class StrategistCliTest(unittest.TestCase):
         self.tmp = Path(tempfile.mkdtemp())
         self.addCleanup(shutil.rmtree, self.tmp, True)
         self.case = self.tmp / "demo_mvp"
+        src_dir = self.case / "sources"
+        src_dir.mkdir(parents=True, exist_ok=True)
+        self.s1 = src_dir / "cohorts_q3_2026.csv"
+        self.s1.write_text("cohorts data\n", encoding="utf-8")
+        self.s2 = src_dir / "market_report.md"
+        self.s2.write_text("market report\n", encoding="utf-8")
 
     def test_01_init_case_creates_valid_structure(self):
         buf = io.StringIO()
@@ -141,7 +147,9 @@ class StrategistCliTest(unittest.TestCase):
             goal="Цель",
             recipient="Получатель",
         )
-        cli.write_json(self.case / sv.CASE_FILES["evidence"], valid_evidence())
+        ev = valid_evidence()
+        ev["sources"][0]["content_hash"] = "sha256:" + sv.artifact_sha256(self.s1)
+        cli.write_json(self.case / sv.CASE_FILES["evidence"], ev)
         cli.write_json(self.case / sv.CASE_FILES["decision"], valid_decision())
         cli.advance_stage(self.case, "DECISION_MONITORING", note="Решение утверждено")
         cli.refresh_artifacts_integrity(self.case)
@@ -225,7 +233,9 @@ class StrategistCliTest(unittest.TestCase):
             goal="Цель",
             recipient="Получатель",
         )
-        cli.write_json(self.case / sv.CASE_FILES["evidence"], valid_evidence())
+        ev = valid_evidence()
+        ev["sources"][0]["content_hash"] = "sha256:" + sv.artifact_sha256(self.s1)
+        cli.write_json(self.case / sv.CASE_FILES["evidence"], ev)
         bad_dec = valid_decision()
         bad_dec["communication_strategy"]["consistency_check"]["is_consistent"] = False
         cli.write_json(self.case / sv.CASE_FILES["decision"], bad_dec)

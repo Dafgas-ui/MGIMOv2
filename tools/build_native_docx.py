@@ -187,7 +187,7 @@ class DocxBuilder:
             tbl_xml.append('</w:tr>')
 
         tbl_xml.append('</w:tbl>')
-        tbl_xml.append('<w:p><w:pPr><w:spacing w:after="180"/></w:p></w:p>')
+        tbl_xml.append('<w:p><w:pPr><w:spacing w:after="180"/></w:pPr></w:p>')
         self.paragraphs.append("".join(tbl_xml))
 
     def save(self, filepath: Path):

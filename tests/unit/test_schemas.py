@@ -602,12 +602,21 @@ class SchemaValidatorTest(unittest.TestCase):
         case = tmp / "demo_mvp"
         (case / "evidence").mkdir(parents=True)
         (case / "decisions").mkdir(parents=True)
+        (case / "sources").mkdir(parents=True)
+
+        s1 = case / "sources" / "cohorts_q3_2026.csv"
+        s1.write_text("cohorts data", encoding="utf-8")
+        s2 = case / "sources" / "market_report.md"
+        s2.write_text("market report", encoding="utf-8")
 
         ev_path = case / "evidence" / "evidence_graph.json"
         dec_path = case / "decisions" / "strategy_decision.json"
         st_path = case / "state.json"
 
-        ev_path.write_text(json.dumps(valid_evidence(), ensure_ascii=False, indent=2), encoding="utf-8")
+        ev_data = valid_evidence()
+        ev_data["sources"][0]["content_hash"] = "sha256:" + sv.artifact_sha256(s1)
+
+        ev_path.write_text(json.dumps(ev_data, ensure_ascii=False, indent=2), encoding="utf-8")
         dec_path.write_text(json.dumps(valid_decision(), ensure_ascii=False, indent=2), encoding="utf-8")
 
         state = copy.deepcopy(valid_state())
@@ -631,12 +640,27 @@ class SchemaValidatorTest(unittest.TestCase):
         self.assertEqual(rc, 0, buf.getvalue())
 
         # Изменение файла после контрольной точки ловится в --strict
-        ev_tampered = valid_evidence()
+        ev_tampered = copy.deepcopy(ev_data)
         ev_tampered["sources"][1]["notes"] = "Изменено после контрольной точки"
         ev_path.write_text(json.dumps(ev_tampered, ensure_ascii=False, indent=2), encoding="utf-8")
         with redirect_stdout(io.StringIO()), redirect_stderr(io.StringIO()):
             self.assertEqual(sv.main(["--case", str(case)]), 0)  # по умолчанию WARNING
             self.assertEqual(sv.main(["--case", str(case), "--strict"]), 1)  # в strict -> ERROR
+
+        # Проверка отлова несовпадения хэша источника (SOURCE_HASH_MISMATCH)
+        s1.write_text("tampered cohorts data", encoding="utf-8")
+        # Возвращаем целостность evidence_graph.json
+        state["checkpoints_and_recovery"]["artifacts_integrity"][0]["sha256"] = sv.artifact_sha256(ev_path)
+        st_path.write_text(json.dumps(state, ensure_ascii=False, indent=2), encoding="utf-8")
+        issues = sv.validate_case(case, strict=True)
+        codes = [i.code for i in issues]
+        self.assertIn("SOURCE_HASH_MISMATCH", codes)
+
+        # Проверка отсутствия файла источника (SOURCE_FILE_MISSING)
+        s1.unlink()
+        issues = sv.validate_case(case, strict=True)
+        codes = [i.code for i in issues]
+        self.assertIn("SOURCE_FILE_MISSING", codes)
 
 
 if __name__ == "__main__":

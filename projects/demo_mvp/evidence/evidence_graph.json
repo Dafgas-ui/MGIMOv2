@@ -56,7 +56,7 @@
       "location": "projects/demo_mvp/sources/product_analytics_q3.csv",
       "trust_boundary": "untrusted_data",
       "verification_level": "content_verified",
-      "content_hash": "sha256:e441ca1136d8f2e46919d3bc11d69a217d425bbbe126ee50387ebd30911c76b7",
+      "content_hash": "sha256:c853341096c953e07b96a47d30ed2618a1c4f8317bcbc2952067c8828ace8201",
       "version": "1.0",
       "retrieved_at": "2026-11-09T10:15:00+03:00",
       "notes": "Выгрузка продуктовых событий триалов; числитель оплат совпадает с S-001 (8026)"
@@ -80,10 +80,10 @@
       "location": "projects/demo_mvp/sources/ux_audit_and_interviews.md",
       "trust_boundary": "untrusted_data",
       "verification_level": "content_verified",
-      "content_hash": "sha256:31b25acca498042bfeb6304dc678bc01bf47785b7cc32b9a2bed243bed7ff090",
+      "content_hash": "sha256:5f1549b82d3de0b15f42b246c0012884700d436523d664dc076db858da2c8357",
       "version": "1.0",
       "retrieved_at": "2026-11-09T11:00:00+03:00",
-      "notes": "14 глубинных интервью, воронка 5 экранов онбординга и 1 синтетическая сессия"
+      "notes": "14 глубинных интервью, воронка 5 экранов онбординга и 1 синтетическая сессия (Учебные синтетические данные / Synthetic Benchmark)"
     }
   ],
   "findings": [
@@ -140,7 +140,7 @@
     },
     {
       "id": "F-004",
-      "statement": "77.2% пользователей покидают воронку онбординга на экране №2 из-за требования немедленного ввода номера родственника и отправки SMS-кода",
+      "statement": "77.2% пользователей покидают воронку онбординга на экране №2 из-за требования немедленного ввода номера родственника и отправки SMS-кода (Учебные синтетические данные / Synthetic Benchmark)",
       "source_refs": [
         "S-004"
       ],
@@ -157,7 +157,7 @@
     },
     {
       "id": "F-005",
-      "statement": "M2 Retention у пользователей, подключивших хотя бы 1 родственника в первую неделю, составляет 68.4% против 24.1% у одиночных аккаунтов",
+      "statement": "M2 Retention у пользователей, подключивших хотя бы 1 родственника в первую неделю, составляет 68.4% против 24.1% у одиночных аккаунтов (Учебные синтетические данные / Synthetic Benchmark)",
       "source_refs": [
         "S-004"
       ],

@@ -197,3 +197,17 @@ changed_files: docs/coordination/task-board.md, docs/coordination/review-handoff
 verified_checks: python -m unittest discover -s tests -v -> 49 tests OK; all scenarios T01-T12 pass deterministically; python tools/schema_validator.py --case projects/demo_mvp --strict -> PASS (0 errors, 0 warnings); python tools/check_coordination.py -> PASS
 limitations: Все 12 приёмочных сценариев подтверждены программно; вердикт аудита PASS выставлен куратором Argon-Prime; ожидает финального утверждения владельцем проекта
 predecessor_ref: HANDOFF TASK-006 (e0de896)
+
+
+## [HANDOFF] Bugfix / Audit Hardening v0.1.1 — 2026-11-10 13:00
+task_id: TASK-006-HOTFIX
+record_type: HANDOFF
+author: Argon-Judge
+timestamp: 2026-11-10 13:00
+commit_hash: 12f86fa
+status: READY_FOR_AUDIT
+agents_md_sha256: 57bf75979bd8d3b17fef9c137c09f9b96bbf5504b8699080955c13da9c900b73
+changed_files: tools/schema_validator.py, tools/strategist_cli.py, tools/generate_final_reports.py, tools/build_native_docx.py, projects/demo_mvp/evidence/evidence_graph.json, projects/demo_mvp/decisions/strategy_decision.json, projects/demo_mvp/outputs/01_research_and_evidence.md, projects/demo_mvp/outputs/02_alternatives_comparison.md, projects/demo_mvp/outputs/03_product_and_comm_strategy.md, projects/demo_mvp/outputs/04_validation_plan_and_governance.md, projects/demo_mvp/state.json, docs/reports/01_Full_System_Audit_Report.docx, docs/reports/02_Interactive_Session_Decisions_and_Prompts_Log.docx, tests/unit/test_schemas.py, tests/unit/test_strategist_cli.py, tests/scenarios/test_acceptance_t01_t12.py, docs/coordination/review-handoff.md
+verified_checks: python tools/check_coordination.py -> PASS; python tools/schema_validator.py --case projects/demo_mvp --strict -> PASS; python -m unittest discover -s tests -v -> 49 tests OK (37 unit + 12 scenario); проверен граничный отлов SOURCE_HASH_MISMATCH при намеренном изменении байта в product_analytics_q3.csv (357 -> 999); проверена валидность XML document.xml в обоих .docx
+limitations: Устранены все 6 замечаний повторного аудита: проверка хэшей источников в validate_case, маркировка синтетических данных S-004/F-004/F-005, разграничение доказанных фактов текущего процесса и целевого проектного концепта в стратегии, сноска на модельную оценку журнала затрат, динамический Git-хэш и калибровка T12 в DOCX
+predecessor_ref: AUDIT TASK-006 (7462894)

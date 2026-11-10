@@ -100,7 +100,7 @@ class AcceptanceScenariosT01ToT12Test(unittest.TestCase):
             source_ids.add(s["id"])
             loc = ROOT / s["location"]
             self.assertTrue(loc.is_file(), f"Файл источника не найден: {loc}")
-            actual_hash = "sha256:" + hashlib.sha256(loc.read_bytes()).hexdigest()
+            actual_hash = "sha256:" + sv.artifact_sha256(loc)
             self.assertEqual(s["content_hash"], actual_hash, f"Несовпадение SHA-256 для {s['id']}")
 
         # Проверяем, что источник S-004 покрывает UX-аудит экранов и глубинные интервью
