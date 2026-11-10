@@ -1381,10 +1381,12 @@ def validate_case(case_dir, strict=False, schemas=None):
     if isinstance(graph, dict):
         base = case_dir.resolve()
         repo_root = base
+        has_repo = False
         cur = base
         while cur.parent != cur:
             if (cur / "AGENTS.md").is_file():
                 repo_root = cur
+                has_repo = True
                 break
             cur = cur.parent
 
@@ -1400,13 +1402,43 @@ def validate_case(case_dir, strict=False, schemas=None):
             case_resolved = case_dir.resolve()
 
             # 1. Явный контракт для внешних/общих источников репозитория
-            if loc_norm.startswith("shared/") or loc_norm.startswith("external/"):
-                shared_cand = (repo_root / loc_norm).resolve()
-                if shared_cand.is_file():
-                    target = shared_cand
+            is_shared = loc_norm.startswith(("shared/", "external/"))
+            if is_shared:
+                if loc_norm.startswith("shared/"):
+                    prefix_dir = "shared"
+                    subpath = loc_norm[len("shared/"):].lstrip("/")
+                else:
+                    prefix_dir = "external"
+                    subpath = loc_norm[len("external/"):].lstrip("/")
 
-            # 2. Локальные источники кейса: разрешение строго привязано к проверяемому case_dir
-            if target is None:
+                # Определение разрешённого корня для общих источников:
+                # В репозитории: repo_root / prefix_dir.
+                # При переносе кейса за пределы репозитория:
+                # разрешённым корнем считается локальный каталог case_dir / prefix_dir.
+                if has_repo:
+                    allowed_root = (repo_root / prefix_dir).resolve()
+                else:
+                    allowed_root = (case_dir / prefix_dir).resolve()
+
+                cand = (allowed_root / subpath).resolve()
+                try:
+                    cand.relative_to(allowed_root)
+                    is_inside = True
+                except ValueError:
+                    is_inside = False
+
+                if not is_inside:
+                    issues.append(Issue("SOURCE_PATH_OUTSIDE_ALLOWED_ROOT",
+                                        f"путь общего источника {loc} выходит за пределы разрешённого каталога {prefix_dir}",
+                                        f"/sources/{i}/location", CASE_FILES["evidence"]))
+                elif not cand.is_file():
+                    issues.append(Issue("SOURCE_FILE_MISSING",
+                                        f"файл общего источника {loc} не найден",
+                                        f"/sources/{i}/location", CASE_FILES["evidence"]))
+                else:
+                    target = cand
+            else:
+                # 2. Локальные источники кейса: разрешение строго привязано к проверяемому case_dir
                 cand_paths = []
                 parts = [p for p in loc_norm.split("/") if p]
                 if len(parts) >= 3 and parts[0] == "projects":
@@ -1419,20 +1451,29 @@ def validate_case(case_dir, strict=False, schemas=None):
                 # Прямой относительный путь внутри case_dir (например, 'sources/...')
                 cand_paths.append((case_dir / loc_norm).resolve())
 
+                inside_candidates = []
                 for cp in cand_paths:
                     # Защита от path traversal: кандидат обязан находиться внутри case_dir
                     try:
                         cp.relative_to(case_resolved)
+                        inside_candidates.append(cp)
                     except ValueError:
                         continue
                     if cp.is_file():
                         target = cp
                         break
 
-            if target is None:
-                issues.append(Issue("SOURCE_FILE_MISSING", f"файл источника {loc} не найден",
-                                    f"/sources/{i}/location", CASE_FILES["evidence"]))
-            else:
+                if target is None:
+                    if not inside_candidates:
+                        issues.append(Issue("SOURCE_PATH_OUTSIDE_CASE",
+                                            f"путь источника {loc} выходит за пределы каталога кейса",
+                                            f"/sources/{i}/location", CASE_FILES["evidence"]))
+                    else:
+                        issues.append(Issue("SOURCE_FILE_MISSING",
+                                            f"файл источника {loc} не найден",
+                                            f"/sources/{i}/location", CASE_FILES["evidence"]))
+
+            if target is not None:
                 expected = s.get("content_hash")
                 if expected:
                     actual = "sha256:" + artifact_sha256(target)

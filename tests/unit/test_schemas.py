@@ -762,6 +762,209 @@ class SchemaValidatorTest(unittest.TestCase):
         (standalone_case / "sources" / "subdir" / "market_report.md").write_text("# Subdir Market Report\n", encoding="utf-8")
         self.assertEqual(sv.validate_case(standalone_case, strict=True), [])
 
+    def test_14_shared_and_external_sources_strict_confinement(self):
+        """Проверяет строгое ограничение области общих источников (shared/ и external/)."""
+        tmp = Path(tempfile.mkdtemp())
+        self.addCleanup(shutil.rmtree, tmp, True)
+        repo = tmp / "repo"
+        repo.mkdir()
+        (repo / "AGENTS.md").write_text("# Agents\n", encoding="utf-8")
+
+        # Внешний файл за пределами репозитория
+        outside = tmp / "outside.txt"
+        outside.write_text("secret_outside_data\n", encoding="utf-8")
+        outside_hash = "sha256:" + sv.artifact_sha256(outside)
+
+        # Разрешённые каталоги shared и external в репозитории
+        shared_dir = repo / "shared"
+        shared_dir.mkdir()
+        shared_file = shared_dir / "benchmarks.csv"
+        shared_file.write_text("metric,value\nretention,0.85\n", encoding="utf-8")
+        shared_hash = "sha256:" + sv.artifact_sha256(shared_file)
+
+        ext_dir = repo / "external"
+        ext_dir.mkdir()
+        ext_file = ext_dir / "external_data.csv"
+        ext_file.write_text("col1,col2\n1,2\n", encoding="utf-8")
+        ext_hash = "sha256:" + sv.artifact_sha256(ext_file)
+
+        # Кейс внутри репозитория
+        case_dir = repo / "projects" / "demo_mvp"
+        case_dir.mkdir(parents=True)
+        (case_dir / "evidence").mkdir(parents=True)
+        (case_dir / "decisions").mkdir(parents=True)
+        (case_dir / "sources").mkdir(parents=True)
+        s_local = case_dir / "sources" / "local.md"
+        s_local.write_text("# Local\n", encoding="utf-8")
+
+        ev = valid_evidence()
+        ev["sources"] = [
+            {
+                "id": "S-001",
+                "title": "Shared Benchmark",
+                "source_type": "spreadsheet",
+                "location": "shared/benchmarks.csv",
+                "trust_boundary": "untrusted_data",
+                "verification_level": "accessible",
+                "content_hash": shared_hash,
+            },
+            {
+                "id": "S-002",
+                "title": "Local Source",
+                "source_type": "document",
+                "location": "sources/local.md",
+                "trust_boundary": "untrusted_data",
+                "verification_level": "accessible",
+                "content_hash": "sha256:" + sv.artifact_sha256(s_local),
+            },
+        ]
+        ev_file = case_dir / "evidence" / "evidence_graph.json"
+        ev_file.write_text(json.dumps(ev, ensure_ascii=False), encoding="utf-8")
+
+        dec_file = case_dir / "decisions" / "strategy_decision.json"
+        dec = valid_decision()
+        dec_file.write_text(json.dumps(dec, ensure_ascii=False), encoding="utf-8")
+
+        st = copy.deepcopy(valid_state())
+        st["checkpoints_and_recovery"]["artifacts_integrity"] = [
+            {"path": "evidence/evidence_graph.json", "sha256": sv.artifact_sha256(ev_file), "recorded_at": "2026-11-09T10:35:00+03:00"},
+            {"path": "decisions/strategy_decision.json", "sha256": sv.artifact_sha256(dec_file), "recorded_at": "2026-11-09T10:35:00+03:00"},
+        ]
+        state_file = case_dir / "state.json"
+        state_file.write_text(json.dumps(st, ensure_ascii=False), encoding="utf-8")
+
+        def _update_ev(new_sources):
+            ev_copy = copy.deepcopy(ev)
+            ev_copy["sources"] = new_sources
+            ev_file.write_text(json.dumps(ev_copy, ensure_ascii=False), encoding="utf-8")
+            st["checkpoints_and_recovery"]["artifacts_integrity"][0]["sha256"] = sv.artifact_sha256(ev_file)
+            state_file.write_text(json.dumps(st, ensure_ascii=False), encoding="utf-8")
+
+        # 1. Допустимый файл внутри shared/ -> PASS
+        self.assertEqual(sv.validate_case(case_dir, strict=True), [])
+
+        # 2. Отсутствующий общий файл -> SOURCE_FILE_MISSING (без перехода к поиску в case_dir)
+        _update_ev([
+            {
+                "id": "S-001",
+                "title": "Missing Shared",
+                "source_type": "spreadsheet",
+                "location": "shared/nonexistent.csv",
+                "trust_boundary": "untrusted_data",
+                "verification_level": "accessible",
+                "content_hash": shared_hash,
+            },
+            ev["sources"][1],
+        ])
+        issues = sv.validate_case(case_dir, strict=True)
+        self.assertIn("SOURCE_FILE_MISSING", [i.code for i in issues])
+        self.assertNotIn("SOURCE_PATH_OUTSIDE_ALLOWED_ROOT", [i.code for i in issues])
+
+        # 3. Обход через shared/../../outside.txt -> SOURCE_PATH_OUTSIDE_ALLOWED_ROOT
+        _update_ev([
+            {
+                "id": "S-001",
+                "title": "Escaped Shared",
+                "source_type": "document",
+                "location": "shared/../../outside.txt",
+                "trust_boundary": "untrusted_data",
+                "verification_level": "accessible",
+                "content_hash": outside_hash,
+            },
+            ev["sources"][1],
+        ])
+        issues = sv.validate_case(case_dir, strict=True)
+        self.assertIn("SOURCE_PATH_OUTSIDE_ALLOWED_ROOT", [i.code for i in issues])
+
+        # 4. Обход через external/../../outside.txt -> SOURCE_PATH_OUTSIDE_ALLOWED_ROOT
+        _update_ev([
+            {
+                "id": "S-001",
+                "title": "Escaped External",
+                "source_type": "document",
+                "location": "external/../../outside.txt",
+                "trust_boundary": "untrusted_data",
+                "verification_level": "accessible",
+                "content_hash": outside_hash,
+            },
+            ev["sources"][1],
+        ])
+        issues = sv.validate_case(case_dir, strict=True)
+        self.assertIn("SOURCE_PATH_OUTSIDE_ALLOWED_ROOT", [i.code for i in issues])
+
+        # 5. Путь с обратными разделителями Windows shared\..\..\outside.txt -> SOURCE_PATH_OUTSIDE_ALLOWED_ROOT
+        _update_ev([
+            {
+                "id": "S-001",
+                "title": "Windows Backslash Traversal",
+                "source_type": "document",
+                "location": "shared\\..\\..\\outside.txt",
+                "trust_boundary": "untrusted_data",
+                "verification_level": "accessible",
+                "content_hash": outside_hash,
+            },
+            ev["sources"][1],
+        ])
+        issues = sv.validate_case(case_dir, strict=True)
+        self.assertIn("SOURCE_PATH_OUTSIDE_ALLOWED_ROOT", [i.code for i in issues])
+
+        # 6. Ссылка файловой системы (symlink) наружу из shared/ (если поддерживается ОС)
+        symlink_created = False
+        symlink_path = shared_dir / "symlink_outside.txt"
+        try:
+            symlink_path.symlink_to(outside)
+            symlink_created = True
+        except (OSError, NotImplementedError):
+            pass
+
+        if symlink_created:
+            _update_ev([
+                {
+                    "id": "S-001",
+                    "title": "Symlink Escape",
+                    "source_type": "document",
+                    "location": "shared/symlink_outside.txt",
+                    "trust_boundary": "untrusted_data",
+                    "verification_level": "accessible",
+                    "content_hash": outside_hash,
+                },
+                ev["sources"][1],
+            ])
+            issues = sv.validate_case(case_dir, strict=True)
+            self.assertIn("SOURCE_PATH_OUTSIDE_ALLOWED_ROOT", [i.code for i in issues])
+
+        # 7. Локальный источник с выходом за пределы каталога кейса -> SOURCE_PATH_OUTSIDE_CASE
+        _update_ev([
+            ev["sources"][0],
+            {
+                "id": "S-002",
+                "title": "Escaped Local",
+                "source_type": "document",
+                "location": "../../outside.txt",
+                "trust_boundary": "untrusted_data",
+                "verification_level": "accessible",
+                "content_hash": outside_hash,
+            },
+        ])
+        issues = sv.validate_case(case_dir, strict=True)
+        self.assertIn("SOURCE_PATH_OUTSIDE_CASE", [i.code for i in issues])
+
+        # 8. Автономная копия кейса за пределами репозитория с локальным каталогом shared/
+        ext_standalone_tmp = Path(tempfile.mkdtemp())
+        self.addCleanup(shutil.rmtree, ext_standalone_tmp, True)
+        standalone = ext_standalone_tmp / "demo_mvp"
+        shutil.copytree(case_dir, standalone)
+        # Создаём локальный shared внутри кейса
+        (standalone / "shared").mkdir()
+        (standalone / "shared" / "benchmarks.csv").write_text("metric,value\nretention,0.85\n", encoding="utf-8")
+        # Восстанавливаем корректные источники
+        ev_valid = copy.deepcopy(ev)
+        (standalone / "evidence" / "evidence_graph.json").write_text(json.dumps(ev_valid, ensure_ascii=False), encoding="utf-8")
+        st_valid = copy.deepcopy(st)
+        st_valid["checkpoints_and_recovery"]["artifacts_integrity"][0]["sha256"] = sv.artifact_sha256(standalone / "evidence" / "evidence_graph.json")
+        (standalone / "state.json").write_text(json.dumps(st_valid, ensure_ascii=False), encoding="utf-8")
+        self.assertEqual(sv.validate_case(standalone, strict=True), [])
+
 
 if __name__ == "__main__":
     unittest.main()
