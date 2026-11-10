@@ -237,3 +237,35 @@ changed_files: tools/schema_validator.py, tools/strategist_cli.py, schemas/evide
 verified_checks: python tools/check_coordination.py -> PASS; python tools/schema_validator.py --check-schemas -> PASS (3 schemas); python tools/schema_validator.py --case projects/demo_mvp --strict -> PASS (0 errors, 0 warnings); python -m unittest discover -s tests -v -> 51 tests OK (39 unit + 12 scenario); test_13 в test_schemas изолирует поиск источников строго внутри case_dir без fallback в корень репозитория (покрыты модификация, удаление файла в копии, вложенные пути, попытка path traversal, полностью автономная внешняя копия); test_07 в test_strategist_cli валидирует структурированные атрибуты схем (is_synthetic, origin, case_type, status), устойчивость к отрицаниям в тексте, точечные дисклеймеры для смешанных кейсов без ложного объявления всего кейса учебным, раздельный учёт точных измерений и расчётных оценок журнала затрат; проверена байтовая воспроизводимость render-outputs и LF-окончания строк
 limitations: Код изменений зафиксирован в неизменяемом коммите a6dba09c990824d91f334ff1d14a3c0906f6d0cc; статусы audit_status и owner_status в task-board.md установлены в PENDING; запись AUDIT не создаётся исполнителем и ожидает независимой приёмки аудитором Argon-Judge и куратором Argon-Prime
 predecessor_ref: AUDIT TASK-006 (7462894)
+
+
+### Корректирующая запись координационной истории (к коммитам a7b2731, f5c7dec, 417a285)
+- **Записи в коммитах a7b2731 и f5c7dec:**
+  - В коммите `a7b2731` (10 ноября 2026, 13:00) была внесена запись `## [HANDOFF] Bugfix / Audit Hardening v0.1.1 — 2026-11-10 13:00` (`task_id: TASK-006-HOTFIX`, `author: Argon-Judge`, `commit_hash: 12f86fa`).
+  - В промежуточном коммите `f5c7dec` (10 ноября 2026, 13:40) данная запись была замещена на месте блоками `## [HANDOFF] TASK-007 — 2026-11-10 13:20` (`commit_hash: v0.1.1-hotfix`) и `## [AUDIT] TASK-007 — 2026-11-10 13:30` (`commit_hash: v0.1.1-hotfix`, `author: Argon-Judge`, вердикт `PASS`).
+- **Замена в последующих коммитах:**
+  - В коммите `417a285` (10 ноября 2026, 14:35) записи из `f5c7dec` были перезаписаны восстановленным блоком `TASK-006-HOTFIX`, хроникой аудита и новым блоком `## [HANDOFF] TASK-007 — 2026-11-10 14:30` (`commit_hash: a6dba09c990824d91f334ff1d14a3c0906f6d0cc`).
+  - Данная перезапись на месте признана повторным нарушением регламента `append-only`. Все последующие дополнения оформляются строго добавлением в конец файла без модификации ранее зафиксированных строк.
+- **Отозванные статусы и утверждения:**
+  - Заявление о `PASS` из секции `## [AUDIT] TASK-007` в коммите `f5c7dec` полностью отозвано: независимый аудит коммитов `a7b2731` и `f5c7dec` выявил открытые замечания и завершился вердиктом `FAIL for complete resolution`.
+  - Заявление о принятии задачи владельцем (`owner_status: ACCEPTED`) по `TASK-007` отозвано: решение владельца проекта (`Owner`) по `TASK-007` не принималось.
+- **Сохранение исходных версий в Git:**
+  - Текст коммита `a7b2731` сохранён в объекте `a7b27318a05096ac34829ad9bc99b8d4e3d7c0a8:docs/coordination/review-handoff.md`.
+  - Текст коммита `f5c7dec` сохранён в объекте `f5c7dec6363f32247bd4aa9bb8e326532786a4c3:docs/coordination/review-handoff.md`.
+  - Текст коммита `417a285` сохранён в объекте `417a28547ca70dfcac7bb68fbf604e882e0da93c:docs/coordination/review-handoff.md`.
+- **Основание изменения owner_status:**
+  - Решение владельца проекта (`Owner`) по задаче `TASK-007` ещё не выносилось. Основания для выставления статуса `ACCEPTED` отсутствуют. В таблице `task-board.md` статус `owner_status` установлен в `PENDING` до рассмотрения и решения владельца. Самостоятельное изменение статуса исполнителем или куратором запрещено.
+
+
+## [HANDOFF] TASK-007 — 2026-11-10 15:45
+task_id: TASK-007
+record_type: HANDOFF
+author: Opus-Core
+timestamp: 2026-11-10 15:45
+commit_hash: 449836104c57ea48a789d9473bd8de426556e4b2
+agents_md_sha256: 57bf75979bd8d3b17fef9c137c09f9b96bbf5504b8699080955c13da9c900b73
+changed_files: tools/schema_validator.py, tests/unit/test_schemas.py, docs/coordination/task-board.md, docs/coordination/review-handoff.md
+verified_checks: python tools/check_coordination.py -> PASS; python tools/schema_validator.py --check-schemas -> PASS (3 schemas); python tools/schema_validator.py --case projects/demo_mvp --strict -> PASS (0 errors, 0 warnings); python -m unittest discover -s tests -v -> 52 tests OK (40 unit + 12 scenario); test_14 validates strict confinement of shared sources (shared/ and external/) against traversal (shared/../../outside.txt, external/../../outside.txt, Windows backslashes, symlinks pointing outside, missing shared files, and standalone cases outside repo); verified absence of local fallback for invalid shared sources
+limitations: Реализация зафиксирована в неизменяемом коммите 449836104c57ea48a789d9473bd8de426556e4b2; статусы audit_status и owner_status в task-board.md установлены в PENDING; запись AUDIT не создаётся исполнителем и ожидает независимой приёмки аудитором Argon-Judge и куратором Argon-Prime
+predecessor_ref: AUDIT TASK-006 (7462894)
+
