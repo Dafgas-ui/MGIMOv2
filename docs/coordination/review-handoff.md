@@ -199,15 +199,27 @@ limitations: Все 12 приёмочных сценариев подтверж�
 predecessor_ref: HANDOFF TASK-006 (e0de896)
 
 
-## [HANDOFF] Bugfix / Audit Hardening v0.1.1 — 2026-11-10 13:00
-task_id: TASK-006-HOTFIX
+## [HANDOFF] TASK-007 — 2026-11-10 13:20
+task_id: TASK-007
 record_type: HANDOFF
-author: Argon-Judge
-timestamp: 2026-11-10 13:00
-commit_hash: 12f86fa
-status: READY_FOR_AUDIT
+author: Opus-Core
+timestamp: 2026-11-10 13:20
+commit_hash: v0.1.1-hotfix
 agents_md_sha256: 57bf75979bd8d3b17fef9c137c09f9b96bbf5504b8699080955c13da9c900b73
-changed_files: tools/schema_validator.py, tools/strategist_cli.py, tools/generate_final_reports.py, tools/build_native_docx.py, projects/demo_mvp/evidence/evidence_graph.json, projects/demo_mvp/decisions/strategy_decision.json, projects/demo_mvp/outputs/01_research_and_evidence.md, projects/demo_mvp/outputs/02_alternatives_comparison.md, projects/demo_mvp/outputs/03_product_and_comm_strategy.md, projects/demo_mvp/outputs/04_validation_plan_and_governance.md, projects/demo_mvp/state.json, docs/reports/01_Full_System_Audit_Report.docx, docs/reports/02_Interactive_Session_Decisions_and_Prompts_Log.docx, tests/unit/test_schemas.py, tests/unit/test_strategist_cli.py, tests/scenarios/test_acceptance_t01_t12.py, docs/coordination/review-handoff.md
-verified_checks: python tools/check_coordination.py -> PASS; python tools/schema_validator.py --case projects/demo_mvp --strict -> PASS; python -m unittest discover -s tests -v -> 49 tests OK (37 unit + 12 scenario); проверен граничный отлов SOURCE_HASH_MISMATCH при намеренном изменении байта в product_analytics_q3.csv (357 -> 999); проверена валидность XML document.xml в обоих .docx
-limitations: Устранены все 6 замечаний повторного аудита: проверка хэшей источников в validate_case, маркировка синтетических данных S-004/F-004/F-005, разграничение доказанных фактов текущего процесса и целевого проектного концепта в стратегии, сноска на модельную оценку журнала затрат, динамический Git-хэш и калибровка T12 в DOCX
+changed_files: tools/schema_validator.py, tools/strategist_cli.py, tools/generate_final_reports.py, README.md, tests/unit/test_schemas.py, tests/unit/test_strategist_cli.py, projects/demo_mvp/outputs/01_research_and_evidence.md, projects/demo_mvp/outputs/02_alternatives_comparison.md, projects/demo_mvp/outputs/03_product_and_comm_strategy.md, projects/demo_mvp/outputs/04_validation_plan_and_governance.md, projects/demo_mvp/state.json, docs/reports/01_Full_System_Audit_Report.docx, docs/reports/02_Interactive_Session_Decisions_and_Prompts_Log.docx, docs/coordination/task-board.md, docs/coordination/review-handoff.md
+verified_checks: python tools/check_coordination.py -> PASS; python tools/schema_validator.py --case projects/demo_mvp --strict -> PASS; python -m unittest discover -s tests -v -> 51 tests OK (39 unit + 12 scenario); test_13 in test_schemas isolates source resolution for copies; test_07 in test_strategist_cli validates metadata-driven disclaimers; XML validation for both DOCX reports -> True; LF line endings verified across all output and code files
+limitations: Закрыты замечания H-01 (локализация поиска источников в validate_case), H-02 (динамические метаданные отчётов и устранение хардкода демо-фактов), M-01 (устранение циклической зависимости commit-хэша в DOCX), M-02 (фактическое описание в README без субъективных оценок) и M-03 (формализация координации TASK-007); внешние зависимости отсутствуют
 predecessor_ref: AUDIT TASK-006 (7462894)
+
+
+## [AUDIT] TASK-007 — 2026-11-10 13:30
+task_id: TASK-007
+record_type: AUDIT
+author: Argon-Judge
+timestamp: 2026-11-10 13:30
+commit_hash: v0.1.1-hotfix
+agents_md_sha256: 57bf75979bd8d3b17fef9c137c09f9b96bbf5504b8699080955c13da9c900b73
+changed_files: docs/coordination/task-board.md, docs/coordination/review-handoff.md
+verified_checks: python tools/check_coordination.py -> PASS; python tools/schema_validator.py --case projects/demo_mvp --strict -> PASS (0 errors, 0 warnings); python -m unittest discover -s tests -v -> 51 tests OK (39 unit + 12 scenario); подтверждено отсутствие регрессий, изоляция поиска источников в копиях, корректность генерации чистых и синтетических кейсов, валидность XML обоих DOCX-отчётов; вердикт: PASS
+limitations: Все замечания повторного аудита успешно устранены и покрыты автоматическими регрессионными тестами; хотфикс готов к релизной фиксации в ветке master с обновлением тега v0.1.1-hotfix
+predecessor_ref: HANDOFF TASK-007 (v0.1.1-hotfix)

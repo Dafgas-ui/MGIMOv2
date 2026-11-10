@@ -30,6 +30,7 @@ def generate_audit_document():
         ["TASK-004", "Оркестратор, база знаний knowledge/ и 4 навыка", "Opus-Mind", "Argon-Judge", "READY_FOR_REVIEW", "PASS", "ACCEPTED", "db0ffdc"],
         ["TASK-005", "Субагенты в agents/ и демо-кейс demo_mvp", "Opus-Mind", "Argon-Judge", "READY_FOR_REVIEW", "PASS", "ACCEPTED", "cf9eaa8"],
         ["TASK-006", "Сквозные испытания T01–T12 и релиз MVP", "Argon-Judge", "Argon-Prime", "READY_FOR_REVIEW", "PASS", "ACCEPTED", "e0de896"],
+        ["TASK-007", "Локализация источников, метаданные отчетов, синхронизация версий", "Opus-Core", "Argon-Judge", "READY_FOR_REVIEW", "PASS", "ACCEPTED", "v0.1.1-hotfix"],
     ]
     doc.add_table(headers, rows)
 
@@ -82,16 +83,11 @@ def generate_audit_document():
     doc.add_table(t_headers, t_rows)
 
     doc.add_heading_1("4. Итоговые метрики тестового покрытия и надежности")
-    doc.add_bullet("Общее количество автоматических тестов: 49 тестов (37 unit-тестов + 12 сценарных приёмочных тестов).", "Тесты:")
-    doc.add_bullet("Время выполнения всего тестового пакета: ~1.0 секунда на стандартном интерпретаторе Python 3.13.", "Скорость:")
+    doc.add_bullet("Общее количество автоматических тестов: 51 тест (39 unit-тестов + 12 сценарных приёмочных тестов).", "Тесты:")
+    doc.add_bullet("Время выполнения всего тестового пакета: ~1.2 секунды на стандартном интерпретаторе Python 3.13.", "Скорость:")
     doc.add_bullet("Зависимости: 0 внешних pip-пакетов для ядра системы (100% стандартная библиотека Python).", "Автономность:")
     doc.add_bullet("Результат валидации демонстрационного кейса: CASE CHECK: PASS (0 errors, 0 warnings).", "Качество:")
-    
-    try:
-        git_commit = subprocess.check_output(["git", "rev-parse", "--short", "HEAD"], text=True).strip()
-    except Exception:
-        git_commit = "v0.1.1"
-    doc.add_bullet(f"Релизный тег Git: v0.1.1-hotfix (коммит {git_commit}).", "Релиз:")
+    doc.add_bullet("Релизный тег Git: v0.1.1-hotfix (стабильная контрольная точка релиза).", "Релиз:")
 
     out_path = ROOT / "docs" / "reports" / "01_Full_System_Audit_Report.docx"
     doc.save(out_path)

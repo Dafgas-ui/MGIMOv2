@@ -26,6 +26,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "tools"))
+sys.path.insert(0, str(ROOT / "tests" / "unit"))
 import schema_validator as sv  # noqa: E402
 import strategist_cli as cli  # noqa: E402
 from test_schemas import valid_decision, valid_evidence  # noqa: E402
@@ -256,6 +257,98 @@ class StrategistCliTest(unittest.TestCase):
 
         # Строгая проверка кейса вместе с контрольными суммами всех 6 артефактов проходит
         self.assertEqual(sv.validate_case(self.case, strict=True), [])
+
+    def test_07_render_outputs_metadata_driven_disclaimers(self):
+        # 1. Чистый (несинтетический) кейс: не должен содержать упоминаний S-004, F-004, P-001 или Gemini/Claude
+        clean_case = self.tmp / "clean_case"
+        cli.init_case(
+            clean_case,
+            raw_request="Оптимизация B2B тарифов",
+            clarified_problem="Снижение маржинальности тарифа Про",
+            goal="Разработать обновленную линейку",
+            recipient="CPO B2B",
+        )
+        src_dir = clean_case / "sources"
+        src_file = src_dir / "clean_report.csv"
+        src_file.write_text("a,b\n1,2\n", encoding="utf-8")
+        src_hash = "sha256:" + sv.artifact_sha256(src_file)
+
+        ev = {
+            "case_id": "clean_case",
+            "created_at": "2026-11-10T10:00:00Z",
+            "updated_at": "2026-11-10T10:00:00Z",
+            "research_questions": [],
+            "sources": [
+                {
+                    "id": "S-101",
+                    "title": "Реальный отчёт продаж",
+                    "source_type": "csv_table",
+                    "location": "sources/clean_report.csv",
+                    "content_hash": src_hash,
+                    "verification_level": "verified_fact",
+                    "trust_boundary": "internal_trusted",
+                    "notes": "Официальная выгрузка биллинга",
+                }
+            ],
+            "findings": [
+                {
+                    "id": "F-101",
+                    "statement": "Маржинальность упала на 4%",
+                    "source_refs": ["S-101"],
+                    "exact_locator": "line 2",
+                    "validity_status": "valid",
+                }
+            ],
+            "calculations": [],
+            "hypotheses": [],
+            "contradictions": [],
+            "knowledge_gaps": [],
+        }
+        cli.write_json(clean_case / sv.CASE_FILES["evidence"], ev)
+
+        dec = valid_decision()
+        dec["case_id"] = "clean_case"
+        dec["alternatives"][0]["supporting_refs"] = ["F-101"]
+        dec["product_strategy"]["selected_option_id"] = "O-001"
+        dec["product_strategy"]["evidence_refs"] = ["F-101"]
+        dec["product_strategy"]["key_capabilities"] = [
+            {"id": "CAP-101", "description": "Автоматический пересчёт лимитов"}
+        ]
+        dec["product_strategy"]["assumptions_and_limits"] = []
+        dec["communication_strategy"]["proof_points"] = [
+            {
+                "promise": "Автоматизация расчёта экономит время",
+                "product_capability_ref": "CAP-101",
+                "evidence_refs": ["F-101"],
+            }
+        ]
+        dec["communication_strategy"]["consistency_check"]["explanation"] = "Обещание опирается на свойство CAP-101"
+        cli.write_json(clean_case / sv.CASE_FILES["decision"], dec)
+
+        cli.render_outputs(clean_case)
+        out01 = (clean_case / "outputs" / "01_research_and_evidence.md").read_text(encoding="utf-8")
+        out02 = (clean_case / "outputs" / "02_alternatives_comparison.md").read_text(encoding="utf-8")
+        out03 = (clean_case / "outputs" / "03_product_and_comm_strategy.md").read_text(encoding="utf-8")
+        out04 = (clean_case / "outputs" / "04_validation_plan_and_governance.md").read_text(encoding="utf-8")
+
+        for doc in (out01, out02, out03, out04):
+            self.assertNotIn("Synthetic Benchmark", doc)
+            self.assertNotIn("Смоделированные данные", doc)
+            self.assertNotIn("S-004", doc)
+            self.assertNotIn("F-004", doc)
+            self.assertNotIn("P-001", doc)
+            self.assertNotIn("Gemini/Claude", doc)
+
+        self.assertIn("CAP-101", out03)
+        self.assertIn("F-101", out03)
+
+        # 2. Синтетический кейс (демо): дисклеймер динамически строится и включает S-004
+        demo_out01 = (ROOT / "projects" / "demo_mvp" / "outputs" / "01_research_and_evidence.md").read_text(encoding="utf-8")
+        demo_out03 = (ROOT / "projects" / "demo_mvp" / "outputs" / "03_product_and_comm_strategy.md").read_text(encoding="utf-8")
+        self.assertIn("Synthetic Benchmark", demo_out01)
+        self.assertIn("S-004", demo_out01)
+        self.assertIn("Synthetic Benchmark", demo_out03)
+        self.assertIn("P-001", demo_out03)
 
 
 if __name__ == "__main__":

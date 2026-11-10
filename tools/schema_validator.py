@@ -1396,14 +1396,24 @@ def validate_case(case_dir, strict=False, schemas=None):
                 continue
 
             target = None
-            cand_paths = [case_dir / loc]
-            if loc.startswith("projects/"):
-                cand_paths.append(repo_root / loc)
-                parts = loc.split("/", 2)
-                if len(parts) == 3:
-                    cand_paths.append(case_dir / parts[2])
-            elif loc.startswith(f"{case_dir.name}/"):
-                cand_paths.append(case_dir / loc[len(case_dir.name) + 1:])
+            cand_paths = []
+            loc_norm = loc.replace("\\", "/")
+
+            # 1. Приоритетно ищем внутри проверяемого каталога кейса (case_dir)
+            cand_paths.append(case_dir / loc_norm)
+            parts = [p for p in loc_norm.split("/") if p]
+            if len(parts) >= 3 and parts[0] == "projects":
+                # отсекаем 'projects/<любой_кейс>/' и ищем остаток внутри case_dir
+                cand_paths.append(case_dir / "/".join(parts[2:]))
+            elif len(parts) >= 2 and parts[0] == case_dir.name:
+                cand_paths.append(case_dir / "/".join(parts[1:]))
+
+            # Поиск по имени файла в case_dir / sources /
+            cand_paths.append(case_dir / "sources" / Path(loc_norm).name)
+
+            # 2. Только если внутри case_dir файл не найден, проверяем корень репозитория
+            if loc_norm.startswith(f"projects/{case_dir.name}/"):
+                cand_paths.append(repo_root / loc_norm)
 
             for cp in cand_paths:
                 if cp.is_file():

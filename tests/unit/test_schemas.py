@@ -662,6 +662,65 @@ class SchemaValidatorTest(unittest.TestCase):
         codes = [i.code for i in issues]
         self.assertIn("SOURCE_FILE_MISSING", codes)
 
+    def test_13_source_hash_checked_in_case_copy_with_original_present(self):
+        """H-01: Валидатор обязан проверять файл источника именно проверяемого кейса,
+
+        даже если оригинальный кейс и изменённая копия существуют одновременно в одном дереве.
+        """
+        tmp = Path(tempfile.mkdtemp())
+        self.addCleanup(shutil.rmtree, tmp, True)
+        (tmp / "AGENTS.md").write_text("# Agents\n", encoding="utf-8")
+
+        # 1. Оригинальный кейс
+        orig = tmp / "projects" / "demo_mvp"
+        (orig / "evidence").mkdir(parents=True)
+        (orig / "decisions").mkdir(parents=True)
+        (orig / "sources").mkdir(parents=True)
+
+        orig_s1 = orig / "sources" / "cohorts_q3_2026.csv"
+        orig_s1.write_text("cohorts,357\n", encoding="utf-8")
+        orig_s2 = orig / "sources" / "market_report.md"
+        orig_s2.write_text("# Market\n", encoding="utf-8")
+
+        ev = valid_evidence()
+        # В evidence_graph location указан с префиксом projects/demo_mvp/
+        ev["sources"][0]["location"] = "projects/demo_mvp/sources/cohorts_q3_2026.csv"
+        ev["sources"][0]["content_hash"] = "sha256:" + sv.artifact_sha256(orig_s1)
+        ev["sources"][1]["location"] = "projects/demo_mvp/sources/market_report.md"
+        ev_file = orig / "evidence" / "evidence_graph.json"
+        ev_file.write_text(json.dumps(ev, ensure_ascii=False), encoding="utf-8")
+
+        dec_file = orig / "decisions" / "strategy_decision.json"
+        dec = valid_decision()
+        dec_file.write_text(json.dumps(dec, ensure_ascii=False), encoding="utf-8")
+
+        st = copy.deepcopy(valid_state())
+        st["checkpoints_and_recovery"]["artifacts_integrity"] = [
+            {"path": "evidence/evidence_graph.json", "sha256": sv.artifact_sha256(ev_file), "recorded_at": "2026-11-09T10:35:00+03:00"},
+            {"path": "decisions/strategy_decision.json", "sha256": sv.artifact_sha256(dec_file), "recorded_at": "2026-11-09T10:35:00+03:00"},
+        ]
+        (orig / "state.json").write_text(json.dumps(st, ensure_ascii=False), encoding="utf-8")
+
+        # Оригинал полностью валиден в strict
+        self.assertEqual(sv.validate_case(orig, strict=True), [])
+
+        # 2. Копия кейса в audit_copy/demo_mvp
+        copy_dir = tmp / "audit_copy" / "demo_mvp"
+        shutil.copytree(orig, copy_dir)
+
+        # Модифицируем файл данных в копии (357 -> 999)
+        copy_s1 = copy_dir / "sources" / "cohorts_q3_2026.csv"
+        copy_s1.write_text("cohorts,999\n", encoding="utf-8")
+
+        # Оригинал по-прежнему полностью валиден
+        self.assertEqual(sv.validate_case(orig, strict=True), [])
+
+        # Копия ОБЯЗАНА выдать ошибку SOURCE_HASH_MISMATCH на своём локальном файле,
+        # а не подглядывать в projects/demo_mvp/
+        issues = sv.validate_case(copy_dir, strict=True)
+        codes = [i.code for i in issues]
+        self.assertIn("SOURCE_HASH_MISMATCH", codes)
+
 
 if __name__ == "__main__":
     unittest.main()

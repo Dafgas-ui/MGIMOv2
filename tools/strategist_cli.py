@@ -1011,21 +1011,55 @@ def log_usage(case_dir, step_id, actor, model_tier="none", duration_sec=0.0,
 # 7. render-outputs (ADR-005)
 # ---------------------------------------------------------------------------
 
-REPORT_SYNTHETIC_DISCLAIMER = (
-    "> [!NOTE]\n"
-    "> Данный отчёт сформирован на базе учебного демонстрационного кейса (Synthetic Benchmark). "
-    "Источник интервью S-004 и метрики удержания являются смоделированными для соревновательного MVP "
-    "и не отражают закрытые коммерческие данные МегаФона."
-)
+
+def _detect_synthetic_disclaimer(state, graph, decision):
+    """Формирует дисклеймер синтетических данных ТОЛЬКО если в кейсе есть синтетические источники/гипотезы."""
+    synth_sources = []
+    synth_hypotheses = []
+    if isinstance(graph, dict):
+        for _, s in sv._iter_nodes(graph, "sources"):
+            notes = (s.get("notes") or "").lower()
+            title = (s.get("title") or "").lower()
+            if "synthetic benchmark" in notes or "учебные синтетические" in notes or "синтетическ" in notes or "синтетическ" in title:
+                synth_sources.append(s.get("id"))
+        for _, h in sv._iter_nodes(graph, "hypotheses"):
+            if h.get("is_synthetic_respondent") or h.get("kind") == "synthetic_insight":
+                synth_hypotheses.append(h.get("id"))
+
+    has_synth_assumptions = False
+    if isinstance(decision, dict):
+        ps = sv._dict(decision, "product_strategy") or {}
+        for _, a in sv._iter_nodes(ps, "assumptions_and_limits"):
+            if a.get("kind") == "synthetic_respondent_basis":
+                has_synth_assumptions = True
+                break
+
+    if not synth_sources and not synth_hypotheses and not has_synth_assumptions:
+        return None
+
+    parts = []
+    if synth_sources:
+        parts.append(f"источники {', '.join(synth_sources)}")
+    if synth_hypotheses:
+        parts.append(f"синтетические инсайты {', '.join(synth_hypotheses)}")
+    details = f" ({'; '.join(parts)})" if parts else ""
+
+    return (
+        "> [!NOTE]\n"
+        f"> Данный отчёт сформирован на базе учебного демонстрационного кейса (Synthetic Benchmark). "
+        f"Смоделированные данные{details} используются для соревновательного MVP и не отражают закрытые коммерческие данные МегаФона."
+    )
 
 
-def _render_01_research_and_evidence(state, graph):
+def _render_01_research_and_evidence(state, graph, disclaimer=None):
     pf = sv._dict(state, "problem_framing") or {}
     lines = [
         f"# 1. Постановка задачи и граф доказательств (`{state.get('case_id')}`)",
         "",
-        REPORT_SYNTHETIC_DISCLAIMER,
-        "",
+    ]
+    if disclaimer:
+        lines.extend([disclaimer, ""])
+    lines.extend([
         "## 1.1. Постановка задачи (Problem Framing)",
         f"- **Исходный запрос:** {pf.get('raw_request') or '—'}",
         f"- **Уточнённая проблема:** {pf.get('clarified_problem') or 'не уточнено'}",
@@ -1035,7 +1069,7 @@ def _render_01_research_and_evidence(state, graph):
         f"- **Доступные данные:** {pf.get('available_data_summary') or 'не указаны'}",
         "",
         "## 1.2. Исследовательские вопросы (`research_questions`)",
-    ]
+    ])
     rqs = list(sv._iter_nodes(graph, "research_questions"))
     if not rqs:
         lines.append("_Исследовательские вопросы ещё не добавлены._")
@@ -1122,15 +1156,17 @@ def _render_01_research_and_evidence(state, graph):
     return "\n".join(lines) + "\n"
 
 
-def _render_02_alternatives_comparison(decision):
+def _render_02_alternatives_comparison(decision, disclaimer=None):
     lines = [
         f"# 2. Сравнение стратегических альтернатив (`{decision.get('case_id')}`)",
         "",
-        REPORT_SYNTHETIC_DISCLAIMER,
-        "",
+    ]
+    if disclaimer:
+        lines.extend([disclaimer, ""])
+    lines.extend([
         f"**Статус решения:** `{decision.get('decision_status')}`",
         "",
-    ]
+    ])
     for _, a in sv._iter_nodes(decision, "alternatives"):
         refs = ", ".join(sv._list(a, "supporting_refs")) or "—"
         lines.extend([
@@ -1143,27 +1179,34 @@ def _render_02_alternatives_comparison(decision):
         for obj in sv._list(a, "strong_objections"):
             lines.append(f"  - {obj}")
         lines.append("")
-    return "\n".join(lines)
+    return "\n".join(lines).rstrip() + "\n"
 
 
-def _render_03_product_and_comm_strategy(decision):
+def _render_03_product_and_comm_strategy(decision, disclaimer=None):
     ps = sv._dict(decision, "product_strategy")
     cs = sv._dict(decision, "communication_strategy")
     lines = [
         f"# 3. Продуктовая и коммуникационная стратегии (`{decision.get('case_id')}`)",
         "",
-        REPORT_SYNTHETIC_DISCLAIMER,
-        "",
     ]
+    if disclaimer:
+        lines.extend([disclaimer, ""])
     if ps is None:
         lines.append("_Продуктовая стратегия находится в статусе черновика и ещё не заполнена._")
     else:
+        caps = [c.get("id") for _, c in sv._iter_nodes(ps, "key_capabilities") if c.get("id")]
+        facts = [r for r in sv._list(ps, "evidence_refs") if r.startswith("F-")]
+        lines.append("## 3.1. Продуктовая стратегия (`product_strategy`)")
+        lines.append("")
+        if caps or facts:
+            facts_text = f"Факты {', '.join(facts)}" if facts else "Фактические наблюдения"
+            caps_text = f"Ключевые свойства концепта ({', '.join(caps)})" if caps else "Целевые свойства концепта"
+            lines.extend([
+                "> [!NOTE]",
+                f"> {facts_text} служат доказательным основанием стратегии. {caps_text} являются целевым концептом и проверяемой гипотезой, ценность которой подлежит валидации на этапе пилота (04_validation_plan_and_governance.md).",
+                "",
+            ])
         lines.extend([
-            "## 3.1. Продуктовая стратегия (`product_strategy`)",
-            "",
-            "> [!NOTE]",
-            "> Факты F-004 и F-005 подтверждают проблему текущего процесса (барьеры ручной настройки и разрыв удержания в текущем продукте). Новые функции (P-001..P-003) являются целевым продуктовым концептом и проверяемой гипотезой, ценность которой подлежит валидации на этапе пилота (описанном в 04_validation_plan_and_governance.md).",
-            "",
             f"- **Выбранная альтернатива:** `{ps.get('selected_option_id')}`",
             f"- **Целевая аудитория:** {ps.get('target_audience')}",
             f"- **Задача пользователя (JTBD):** {ps.get('user_job_to_be_done')}",
@@ -1218,10 +1261,10 @@ def _render_03_product_and_comm_strategy(decision):
             f"- **Согласовано (`is_consistent`):** `{chk.get('is_consistent')}`",
             f"- **Пояснение:** {chk.get('explanation')}",
         ])
-    return "\n".join(lines) + "\n"
+    return "\n".join(lines).rstrip() + "\n"
 
 
-def _render_04_validation_and_governance(state, graph, decision):
+def _render_04_validation_and_governance(state, graph, decision, disclaimer=None):
     vp = sv._dict(decision, "validation_plan")
     ds = sv._dict(decision, "decision_support_and_reassessment")
     idx = sv.EvidenceIndex(graph)
@@ -1229,13 +1272,15 @@ def _render_04_validation_and_governance(state, graph, decision):
     lines = [
         f"# 4. План проверки, сопровождение решения и экономика работы (`{state.get('case_id')}`)",
         "",
-        REPORT_SYNTHETIC_DISCLAIMER,
-        "",
+    ]
+    if disclaimer:
+        lines.extend([disclaimer, ""])
+    lines.extend([
         f"- **Текущий этап workflow:** `{state.get('workflow', {}).get('current_stage')}`",
         f"- **Статус решения:** `{decision.get('decision_status')}`",
         f"- **Устаревшие узлы графа (`T08`):** `{', '.join(stale_nodes) or 'нет'}`",
         "",
-    ]
+    ])
     if vp is None:
         lines.append("_План проверки (validation_plan) ещё не заполнен._")
     else:
@@ -1293,18 +1338,23 @@ def _render_04_validation_and_governance(state, graph, decision):
         f"- **Оценка стоимости:** `${totals.get('total_estimated_cost_usd', 0):.6f}`",
         "",
     ])
-    for _, e in sv._iter_nodes(ledger, "entries"):
+    entries = list(sv._iter_nodes(ledger, "entries"))
+    for _, e in entries:
         est = "оценка" if e.get("is_estimated") else "точно"
         lines.append(
             f"- `{e.get('step_id')}` [{e.get('model_tier')}] `{e.get('actor_or_tool')}`: "
             f"{e.get('duration_sec')}s, in={e.get('tokens_in')}, out={e.get('tokens_out')}, "
             f"${e.get('estimated_cost_usd')} ({est})"
         )
-    lines.extend([
-        "",
-        "*Расчётная модельная оценка полного прогона пайплайна (Model Benchmark Estimate на профиле Gemini/Claude), первичные тайминги отдельных вызовов калиброваны по тестовым прогонам.*",
-    ])
-    return "\n".join(lines) + "\n"
+    has_estimated = any(e.get("is_estimated") for _, e in entries)
+    if has_estimated:
+        actors = sorted({e.get("actor_or_tool") for _, e in entries if e.get("actor_or_tool") and e.get("is_estimated")})
+        actor_info = f" ({', '.join(actors)})" if actors else ""
+        lines.extend([
+            "",
+            f"*Расчётная модельная оценка полного прогона пайплайна{actor_info}, первичные тайминги вызовов калиброваны по контрольным прогонам.*",
+        ])
+    return "\n".join(lines).rstrip() + "\n"
 
 
 def render_outputs(case_dir):
@@ -1314,12 +1364,21 @@ def render_outputs(case_dir):
     graph = sv.load_json(case_dir / sv.CASE_FILES["evidence"])
     decision = sv.load_json(case_dir / sv.CASE_FILES["decision"])
 
+    disclaimer = _detect_synthetic_disclaimer(state, graph, decision)
+
     docs = {
-        OUTPUT_FILES[0]: _render_01_research_and_evidence(state, graph),
-        OUTPUT_FILES[1]: _render_02_alternatives_comparison(decision),
-        OUTPUT_FILES[2]: _render_03_product_and_comm_strategy(decision),
-        OUTPUT_FILES[3]: _render_04_validation_and_governance(state, graph, decision),
+        OUTPUT_FILES[0]: _render_01_research_and_evidence(state, graph, disclaimer=disclaimer),
+        OUTPUT_FILES[1]: _render_02_alternatives_comparison(decision, disclaimer=disclaimer),
+        OUTPUT_FILES[2]: _render_03_product_and_comm_strategy(decision, disclaimer=disclaimer),
+        OUTPUT_FILES[3]: _render_04_validation_and_governance(state, graph, decision, disclaimer=disclaimer),
     }
+    for rel, content in docs.items():
+        out_path = case_dir / rel
+        out_path.parent.mkdir(parents=True, exist_ok=True)
+        out_path.write_text(content, encoding="utf-8", newline="\n")
+
+    records = refresh_artifacts_integrity(case_dir, state=state)
+    return {"rendered_files": list(OUTPUT_FILES), "artifacts_integrity": records}
     for rel, content in docs.items():
         out_path = case_dir / rel
         out_path.parent.mkdir(parents=True, exist_ok=True)
