@@ -17,6 +17,7 @@
 """
 import io
 import json
+import copy
 import shutil
 import sys
 import tempfile
@@ -29,7 +30,7 @@ sys.path.insert(0, str(ROOT / "tools"))
 sys.path.insert(0, str(ROOT / "tests" / "unit"))
 import schema_validator as sv  # noqa: E402
 import strategist_cli as cli  # noqa: E402
-from test_schemas import valid_decision, valid_evidence  # noqa: E402
+from test_schemas import valid_decision, valid_evidence, valid_state  # noqa: E402
 
 
 class StrategistCliTest(unittest.TestCase):
@@ -338,11 +339,97 @@ class StrategistCliTest(unittest.TestCase):
             self.assertNotIn("F-004", doc)
             self.assertNotIn("P-001", doc)
             self.assertNotIn("Gemini/Claude", doc)
+            self.assertNotIn("калиброваны по контрольным прогонам", doc)
 
         self.assertIn("CAP-101", out03)
         self.assertIn("F-101", out03)
 
-        # 2. Синтетический кейс (демо): дисклеймер динамически строится и включает S-004
+        # 2. Отрицание в notes и синтетика в названии темы не должны ошибочно классифицироваться
+        ev_neg = copy.deepcopy(ev)
+        ev_neg["sources"][0]["notes"] = "Синтетические данные не использовались в исследовании"
+        ev_neg["sources"][0]["title"] = "Аналитический обзор рынка синтетических медиа и ИИ-аватаров"
+        ev_neg["sources"][0]["is_synthetic"] = False
+        cli.write_json(clean_case / sv.CASE_FILES["evidence"], ev_neg)
+        cli.render_outputs(clean_case)
+        neg_out01 = (clean_case / "outputs" / "01_research_and_evidence.md").read_text(encoding="utf-8")
+        self.assertNotIn("Synthetic Benchmark", neg_out01)
+        self.assertNotIn("Смоделированные данные", neg_out01)
+
+        # 3. Реальный кейс + одна гипотеза с синтетическим респондентом (H-201)
+        # Должен маркировать ТОЛЬКО H-201 и НЕ объявлять весь кейс учебным или соревновательным MVP
+        ev_mixed = copy.deepcopy(ev)
+        ev_mixed["hypotheses"] = [
+            {
+                "id": "H-201",
+                "statement": "Семейный пакет увеличит LTV",
+                "kind": "synthetic_insight",
+                "is_synthetic_respondent": True,
+                "depends_on": ["F-101"],
+                "confidence": "low",
+                "verification_method": "Пилот",
+                "validity_status": "valid",
+            }
+        ]
+        cli.write_json(clean_case / sv.CASE_FILES["evidence"], ev_mixed)
+        cli.render_outputs(clean_case)
+        mixed_out01 = (clean_case / "outputs" / "01_research_and_evidence.md").read_text(encoding="utf-8")
+        self.assertIn("Исследование содержит смоделированные данные", mixed_out01)
+        self.assertIn("H-201", mixed_out01)
+        self.assertNotIn("Synthetic Benchmark", mixed_out01)
+        self.assertNotIn("соревновательного MVP", mixed_out01)
+        self.assertNotIn("МегаФона", mixed_out01)
+
+        # 4. Проверка различия существующих и проектируемых свойств продукта (Issue C1)
+        dec_caps = copy.deepcopy(dec)
+        dec_caps["product_strategy"]["key_capabilities"] = [
+            {"id": "CAP-101", "description": "Существующий биллинг", "status": "existing"},
+            {"id": "CAP-102", "description": "Проектируемый push-дайджест", "status": "planned"},
+        ]
+        dec_caps["communication_strategy"]["proof_points"][0]["product_capability_ref"] = "CAP-101"
+        cli.write_json(clean_case / sv.CASE_FILES["decision"], dec_caps)
+        cli.render_outputs(clean_case)
+        caps_out03 = (clean_case / "outputs" / "03_product_and_comm_strategy.md").read_text(encoding="utf-8")
+        self.assertIn("Подтверждённые возможности (CAP-101) сочетаются с проектируемыми доработками (CAP-102)", caps_out03)
+
+        # 5. Проверка журнала затрат: фактологическое разделение точных и оценочных записей (Issue C2)
+        st_ledger = copy.deepcopy(valid_state())
+        st_ledger["case_id"] = "clean_case"
+        st_ledger["cost_and_usage_ledger"]["entries"] = [
+            {
+                "step_id": "STEP-01",
+                "timestamp": "2026-11-10T10:00:00Z",
+                "actor_or_tool": "data-engine",
+                "model_tier": "none",
+                "duration_sec": 1.5,
+                "tokens_in": 0,
+                "tokens_out": 0,
+                "estimated_cost_usd": 0.0,
+                "is_estimated": False,
+            },
+            {
+                "step_id": "STEP-02",
+                "timestamp": "2026-11-10T10:01:00Z",
+                "actor_or_tool": "llm-strategist",
+                "model_tier": "standard",
+                "duration_sec": 4.2,
+                "tokens_in": 1200,
+                "tokens_out": 450,
+                "estimated_cost_usd": 0.015,
+                "is_estimated": True,
+            },
+        ]
+        st_ledger["cost_and_usage_ledger"]["totals"] = {
+            "total_duration_sec": 5.7,
+            "total_tokens": 1650,
+            "total_estimated_cost_usd": 0.015,
+        }
+        cli.write_json(clean_case / sv.CASE_FILES["state"], st_ledger)
+        cli.render_outputs(clean_case)
+        ledger_out04 = (clean_case / "outputs" / "04_validation_plan_and_governance.md").read_text(encoding="utf-8")
+        self.assertIn("Журнал содержит как прямые измерения (1 оп.), так и расчётные оценки (1 оп.).", ledger_out04)
+        self.assertNotIn("калиброваны по контрольным прогонам", ledger_out04)
+
+        # 6. Полностью учебный демонстрационный кейс (demo_mvp)
         demo_out01 = (ROOT / "projects" / "demo_mvp" / "outputs" / "01_research_and_evidence.md").read_text(encoding="utf-8")
         demo_out03 = (ROOT / "projects" / "demo_mvp" / "outputs" / "03_product_and_comm_strategy.md").read_text(encoding="utf-8")
         self.assertIn("Synthetic Benchmark", demo_out01)

@@ -100,7 +100,11 @@
       "required": ["id", "description"],
       "properties": {
         "id": { "type": "string", "pattern": "^P-[0-9]{3,}$" },
-        "description": { "$ref": "#/$defs/non_empty_string" }
+        "description": { "$ref": "#/$defs/non_empty_string" },
+        "status": {
+          "description": "Статус свойства: existing — подтверждённая существующая возможность; planned — проектируемая доработка; hypothetical — гипотетическое свойство целевого концепта; unknown — статус не специфицирован.",
+          "enum": ["existing", "planned", "hypothetical", "unknown"]
+        }
       }
     },
     "assumption": {

@@ -721,6 +721,47 @@ class SchemaValidatorTest(unittest.TestCase):
         codes = [i.code for i in issues]
         self.assertIn("SOURCE_HASH_MISMATCH", codes)
 
+        # 3. Удаление источника из копии при наличии оригинального файла
+        # Должно приводить к SOURCE_FILE_MISSING, а не к скрытой подмене оригиналом!
+        copy_s1.unlink()
+        issues_after_delete = sv.validate_case(copy_dir, strict=True)
+        codes_after_delete = [i.code for i in issues_after_delete]
+        self.assertIn("SOURCE_FILE_MISSING", codes_after_delete)
+        # Оригинал при этом остаётся валидным
+        self.assertEqual(sv.validate_case(orig, strict=True), [])
+
+        # 4. Проверка точного пути во вложенном каталоге (запрет молчаливой подмены по basename)
+        nested_dir = orig / "sources" / "subdir"
+        nested_dir.mkdir(parents=True)
+        nested_file = nested_dir / "market_report.md"
+        nested_file.write_text("# Subdir Market Report\n", encoding="utf-8")
+
+        ev_nested = copy.deepcopy(ev)
+        ev_nested["sources"][1]["location"] = "sources/subdir/market_report.md"
+        ev_nested["sources"][1]["content_hash"] = "sha256:" + sv.artifact_sha256(nested_file)
+        ev_file.write_text(json.dumps(ev_nested, ensure_ascii=False), encoding="utf-8")
+        st["checkpoints_and_recovery"]["artifacts_integrity"][0]["sha256"] = sv.artifact_sha256(ev_file)
+        (orig / "state.json").write_text(json.dumps(st, ensure_ascii=False), encoding="utf-8")
+
+        # При наличии точного вложенного файла валидация проходит
+        self.assertEqual(sv.validate_case(orig, strict=True), [])
+
+        # Удаляем вложенный файл, но оставляем одноимённый orig_s2 ("sources/market_report.md")
+        nested_file.unlink()
+        issues_nested_missing = sv.validate_case(orig, strict=True)
+        codes_nested_missing = [i.code for i in issues_nested_missing]
+        # Валидатор ОБЯЗАН зафиксировать SOURCE_FILE_MISSING и не подменять его файлом из корня sources/
+        self.assertIn("SOURCE_FILE_MISSING", codes_nested_missing)
+
+        # 5. Полная копия кейса, вынесенная за пределы репозитория (автономность)
+        external_tmp = Path(tempfile.mkdtemp())
+        self.addCleanup(shutil.rmtree, external_tmp, True)
+        standalone_case = external_tmp / "demo_mvp"
+        shutil.copytree(orig, standalone_case)
+        # Восстанавливаем вложенный файл для чистоты
+        (standalone_case / "sources" / "subdir" / "market_report.md").write_text("# Subdir Market Report\n", encoding="utf-8")
+        self.assertEqual(sv.validate_case(standalone_case, strict=True), [])
+
 
 if __name__ == "__main__":
     unittest.main()

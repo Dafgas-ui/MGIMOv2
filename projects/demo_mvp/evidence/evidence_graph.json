@@ -83,6 +83,8 @@
       "content_hash": "sha256:5f1549b82d3de0b15f42b246c0012884700d436523d664dc076db858da2c8357",
       "version": "1.0",
       "retrieved_at": "2026-11-09T11:00:00+03:00",
+      "is_synthetic": true,
+      "origin": "synthetic_benchmark",
       "notes": "14 глубинных интервью, воронка 5 экранов онбординга и 1 синтетическая сессия (Учебные синтетические данные / Synthetic Benchmark)"
     }
   ],

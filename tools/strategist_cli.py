@@ -1013,18 +1013,40 @@ def log_usage(case_dir, step_id, actor, model_tier="none", duration_sec=0.0,
 
 
 def _detect_synthetic_disclaimer(state, graph, decision):
-    """Формирует дисклеймер синтетических данных ТОЛЬКО если в кейсе есть синтетические источники/гипотезы."""
+    """Формирует дисклеймер синтетических данных на основе структуры и происхождения элементов."""
     synth_sources = []
     synth_hypotheses = []
+
+    # 1. Сбор синтетических источников по явным структурированным признакам
     if isinstance(graph, dict):
         for _, s in sv._iter_nodes(graph, "sources"):
-            notes = (s.get("notes") or "").lower()
-            title = (s.get("title") or "").lower()
-            if "synthetic benchmark" in notes or "учебные синтетические" in notes or "синтетическ" in notes or "синтетическ" in title:
-                synth_sources.append(s.get("id"))
+            sid = s.get("id")
+            if not sid:
+                continue
+            is_synth = s.get("is_synthetic") is True or s.get("origin") in ("synthetic_benchmark", "synthetic_model")
+            # Для обратной совместимости с учебным demo_mvp
+            if not is_synth and s.get("id") == "S-004" and graph.get("case_id") == "demo_mvp":
+                is_synth = True
+            if is_synth:
+                synth_sources.append(sid)
+
+        # 2. Сбор синтетических гипотез
         for _, h in sv._iter_nodes(graph, "hypotheses"):
+            hid = h.get("id")
+            if not hid:
+                continue
             if h.get("is_synthetic_respondent") or h.get("kind") == "synthetic_insight":
-                synth_hypotheses.append(h.get("id"))
+                synth_hypotheses.append(hid)
+
+    # 3. Проверка типа кейса (учебный бенчмарк vs рабочее исследование)
+    case_type = None
+    if isinstance(state, dict):
+        case_type = state.get("case_type")
+    if not case_type and isinstance(graph, dict):
+        case_type = graph.get("case_type")
+
+    is_benchmark_case = (case_type in ("synthetic_benchmark", "educational_demo")
+                         or (isinstance(state, dict) and state.get("case_id") == "demo_mvp"))
 
     has_synth_assumptions = False
     if isinstance(decision, dict):
@@ -1034,20 +1056,41 @@ def _detect_synthetic_disclaimer(state, graph, decision):
                 has_synth_assumptions = True
                 break
 
-    if not synth_sources and not synth_hypotheses and not has_synth_assumptions:
+    # Если синтетических элементов нет и кейс не учебный — дисклеймер не нужен
+    if not synth_sources and not synth_hypotheses and not has_synth_assumptions and not is_benchmark_case:
         return None
 
+    # Контекстное определение компании по постановке задачи
+    pf = sv._dict(state, "problem_framing") or {}
+    req_text = (pf.get("raw_request") or "").lower() + " " + (pf.get("goal") or "").lower()
+    company_mention = "МегаФона" if "мегафон" in req_text else "компании"
+
+    # Вариант А: Кейс полностью классифицирован как учебный бенчмарк
+    if is_benchmark_case:
+        parts = []
+        if synth_sources:
+            parts.append(f"источники {', '.join(synth_sources)}")
+        if synth_hypotheses:
+            parts.append(f"синтетические инсайты {', '.join(synth_hypotheses)}")
+        details = f" ({'; '.join(parts)})" if parts else ""
+        return (
+            "> [!NOTE]\n"
+            f"> Данный отчёт сформирован на базе учебного демонстрационного кейса (Synthetic Benchmark). "
+            f"Смоделированные данные{details} используются для соревновательного MVP и не отражают закрытые коммерческие данные {company_mention}."
+        )
+
+    # Вариант Б: Рабочее исследование со смоделированными данными / респондентами
     parts = []
     if synth_sources:
-        parts.append(f"источники {', '.join(synth_sources)}")
+        parts.append(f"источники: {', '.join(synth_sources)}")
     if synth_hypotheses:
-        parts.append(f"синтетические инсайты {', '.join(synth_hypotheses)}")
+        parts.append(f"модельные гипотезы: {', '.join(synth_hypotheses)}")
     details = f" ({'; '.join(parts)})" if parts else ""
 
     return (
         "> [!NOTE]\n"
-        f"> Данный отчёт сформирован на базе учебного демонстрационного кейса (Synthetic Benchmark). "
-        f"Смоделированные данные{details} используются для соревновательного MVP и не отражают закрытые коммерческие данные МегаФона."
+        f"> Исследование содержит смоделированные данные{details}. Результаты моделирования и синтетических "
+        f"сессий используются для генерации поисковых гипотез и не являются доказательством фактического рыночного спроса."
     )
 
 
@@ -1194,18 +1237,39 @@ def _render_03_product_and_comm_strategy(decision, disclaimer=None):
     if ps is None:
         lines.append("_Продуктовая стратегия находится в статусе черновика и ещё не заполнена._")
     else:
-        caps = [c.get("id") for _, c in sv._iter_nodes(ps, "key_capabilities") if c.get("id")]
+        cap_nodes = list(sv._iter_nodes(ps, "key_capabilities"))
+        caps_all = [c.get("id") for _, c in cap_nodes if c.get("id")]
+        existing_caps = [c.get("id") for _, c in cap_nodes if c.get("id") and c.get("status") == "existing"]
+        planned_caps = [c.get("id") for _, c in cap_nodes if c.get("id") and c.get("status") in ("planned", "hypothetical")]
         facts = [r for r in sv._list(ps, "evidence_refs") if r.startswith("F-")]
         lines.append("## 3.1. Продуктовая стратегия (`product_strategy`)")
         lines.append("")
-        if caps or facts:
-            facts_text = f"Факты {', '.join(facts)}" if facts else "Фактические наблюдения"
-            caps_text = f"Ключевые свойства концепта ({', '.join(caps)})" if caps else "Целевые свойства концепта"
-            lines.extend([
-                "> [!NOTE]",
-                f"> {facts_text} служат доказательным основанием стратегии. {caps_text} являются целевым концептом и проверяемой гипотезой, ценность которой подлежит валидации на этапе пилота (04_validation_plan_and_governance.md).",
-                "",
-            ])
+        if caps_all or facts:
+            note_sentences = []
+            if facts:
+                note_sentences.append(f"Фактические наблюдения ({', '.join(facts)}) служат доказательным основанием стратегии.")
+            if planned_caps and existing_caps:
+                note_sentences.append(
+                    f"Подтверждённые возможности ({', '.join(existing_caps)}) сочетаются с проектируемыми доработками ({', '.join(planned_caps)}), подлежащими проверке в пилоте."
+                )
+            elif planned_caps:
+                note_sentences.append(
+                    f"Проектируемые свойства ({', '.join(planned_caps)}) являются целевыми доработками и подлежат валидации в пилоте."
+                )
+            elif existing_caps:
+                note_sentences.append(
+                    f"Ключевые свойства ({', '.join(existing_caps)}) опираются на существующие и подтверждённые возможности продукта."
+                )
+            elif caps_all:
+                note_sentences.append(
+                    f"Ключевые свойства продукта ({', '.join(caps_all)}) определяют целевую конфигурацию решения."
+                )
+            if note_sentences:
+                lines.extend([
+                    "> [!NOTE]",
+                    f"> {' '.join(note_sentences)}",
+                    "",
+                ])
         lines.extend([
             f"- **Выбранная альтернатива:** `{ps.get('selected_option_id')}`",
             f"- **Целевая аудитория:** {ps.get('target_audience')}",
@@ -1221,7 +1285,8 @@ def _render_03_product_and_comm_strategy(decision, disclaimer=None):
             lines.append(f"- **{ca.get('name')}** (`{ca.get('alternative_type')}`): {ca.get('notes') or '—'}")
         lines.extend(["", "### Ключевые свойства продукта (`key_capabilities`)"])
         for _, cap in sv._iter_nodes(ps, "key_capabilities"):
-            lines.append(f"- **{cap.get('id')}**: {cap.get('description')}")
+            st_badge = f" [{cap.get('status')}]" if cap.get("status") else ""
+            lines.append(f"- **{cap.get('id')}**{st_badge}: {cap.get('description')}")
         lines.extend(["", "### Осознанные отказы (`explicit_refusals` — что продукт НЕ делает)"])
         for ref_text in sv._list(ps, "explicit_refusals"):
             lines.append(f"- {ref_text}")
@@ -1346,14 +1411,24 @@ def _render_04_validation_and_governance(state, graph, decision, disclaimer=None
             f"{e.get('duration_sec')}s, in={e.get('tokens_in')}, out={e.get('tokens_out')}, "
             f"${e.get('estimated_cost_usd')} ({est})"
         )
-    has_estimated = any(e.get("is_estimated") for _, e in entries)
-    if has_estimated:
-        actors = sorted({e.get("actor_or_tool") for _, e in entries if e.get("actor_or_tool") and e.get("is_estimated")})
-        actor_info = f" ({', '.join(actors)})" if actors else ""
-        lines.extend([
-            "",
-            f"*Расчётная модельная оценка полного прогона пайплайна{actor_info}, первичные тайминги вызовов калиброваны по контрольным прогонам.*",
-        ])
+
+    est_count = sum(1 for _, e in entries if e.get("is_estimated"))
+    exact_count = len(entries) - est_count
+
+    if entries:
+        lines.append("")
+        if est_count > 0 and exact_count > 0:
+            lines.append(
+                f"*Журнал содержит как прямые измерения ({exact_count} оп.), так и расчётные оценки ({est_count} оп.).*"
+            )
+        elif est_count > 0:
+            lines.append(
+                f"*Все операции журнала ({est_count} оп.) зафиксированы на основе расчётных оценок расхода токенов и времени.*"
+            )
+        else:
+            lines.append(
+                f"*Все операции журнала ({exact_count} оп.) зафиксированы по прямым измерениям.*"
+            )
     return "\n".join(lines).rstrip() + "\n"
 
 
@@ -1372,13 +1447,6 @@ def render_outputs(case_dir):
         OUTPUT_FILES[2]: _render_03_product_and_comm_strategy(decision, disclaimer=disclaimer),
         OUTPUT_FILES[3]: _render_04_validation_and_governance(state, graph, decision, disclaimer=disclaimer),
     }
-    for rel, content in docs.items():
-        out_path = case_dir / rel
-        out_path.parent.mkdir(parents=True, exist_ok=True)
-        out_path.write_text(content, encoding="utf-8", newline="\n")
-
-    records = refresh_artifacts_integrity(case_dir, state=state)
-    return {"rendered_files": list(OUTPUT_FILES), "artifacts_integrity": records}
     for rel, content in docs.items():
         out_path = case_dir / rel
         out_path.parent.mkdir(parents=True, exist_ok=True)

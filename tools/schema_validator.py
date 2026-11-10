@@ -1396,29 +1396,38 @@ def validate_case(case_dir, strict=False, schemas=None):
                 continue
 
             target = None
-            cand_paths = []
-            loc_norm = loc.replace("\\", "/")
+            loc_norm = loc.replace("\\", "/").strip()
+            case_resolved = case_dir.resolve()
 
-            # 1. Приоритетно ищем внутри проверяемого каталога кейса (case_dir)
-            cand_paths.append(case_dir / loc_norm)
-            parts = [p for p in loc_norm.split("/") if p]
-            if len(parts) >= 3 and parts[0] == "projects":
-                # отсекаем 'projects/<любой_кейс>/' и ищем остаток внутри case_dir
-                cand_paths.append(case_dir / "/".join(parts[2:]))
-            elif len(parts) >= 2 and parts[0] == case_dir.name:
-                cand_paths.append(case_dir / "/".join(parts[1:]))
+            # 1. Явный контракт для внешних/общих источников репозитория
+            if loc_norm.startswith("shared/") or loc_norm.startswith("external/"):
+                shared_cand = (repo_root / loc_norm).resolve()
+                if shared_cand.is_file():
+                    target = shared_cand
 
-            # Поиск по имени файла в case_dir / sources /
-            cand_paths.append(case_dir / "sources" / Path(loc_norm).name)
+            # 2. Локальные источники кейса: разрешение строго привязано к проверяемому case_dir
+            if target is None:
+                cand_paths = []
+                parts = [p for p in loc_norm.split("/") if p]
+                if len(parts) >= 3 and parts[0] == "projects":
+                    # 'projects/<case_id>/<rel_path>' -> разрешаем '<rel_path>' внутри case_dir
+                    cand_paths.append((case_dir / "/".join(parts[2:])).resolve())
+                elif len(parts) >= 2 and parts[0] in (case_dir.name, graph.get("case_id")):
+                    # '<case_id>/<rel_path>' -> разрешаем '<rel_path>' внутри case_dir
+                    cand_paths.append((case_dir / "/".join(parts[1:])).resolve())
 
-            # 2. Только если внутри case_dir файл не найден, проверяем корень репозитория
-            if loc_norm.startswith(f"projects/{case_dir.name}/"):
-                cand_paths.append(repo_root / loc_norm)
+                # Прямой относительный путь внутри case_dir (например, 'sources/...')
+                cand_paths.append((case_dir / loc_norm).resolve())
 
-            for cp in cand_paths:
-                if cp.is_file():
-                    target = cp
-                    break
+                for cp in cand_paths:
+                    # Защита от path traversal: кандидат обязан находиться внутри case_dir
+                    try:
+                        cp.relative_to(case_resolved)
+                    except ValueError:
+                        continue
+                    if cp.is_file():
+                        target = cp
+                        break
 
             if target is None:
                 issues.append(Issue("SOURCE_FILE_MISSING", f"файл источника {loc} не найден",

@@ -138,6 +138,14 @@
         },
         "version": { "type": ["string", "null"] },
         "retrieved_at": { "anyOf": [{ "$ref": "#/$defs/timestamp" }, { "type": "null" }] },
+        "is_synthetic": {
+          "description": "true — источник смоделирован/синтезирован (не является эмпирическим фактом).",
+          "type": "boolean"
+        },
+        "origin": {
+          "description": "Происхождение источника: empirical — первичные/вторичные эмпирические данные; synthetic_benchmark — синтетический бенчмарк; synthetic_model — модельная генерация; unknown — происхождение не установлено.",
+          "enum": ["empirical", "synthetic_benchmark", "synthetic_model", "unknown"]
+        },
         "notes": { "type": ["string", "null"] }
       }
     },

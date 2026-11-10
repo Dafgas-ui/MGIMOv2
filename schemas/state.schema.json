@@ -21,6 +21,10 @@
     "created_at": { "$ref": "#/$defs/timestamp" },
     "updated_at": { "$ref": "#/$defs/timestamp" },
     "problem_framing": { "$ref": "#/$defs/problem_framing" },
+    "case_type": {
+      "description": "Тип кейса: production — реальный кейс; synthetic_benchmark — синтетический бенчмарк; educational_demo — учебный демонстрационный кейс; exploratory — поисковое исследование.",
+      "enum": ["production", "synthetic_benchmark", "educational_demo", "exploratory"]
+    },
     "workflow": { "$ref": "#/$defs/workflow" },
     "checkpoints_and_recovery": { "$ref": "#/$defs/checkpoints_and_recovery" },
     "cost_and_usage_ledger": { "$ref": "#/$defs/cost_and_usage_ledger" }
