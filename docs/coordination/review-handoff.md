@@ -322,3 +322,21 @@ predecessor_ref: HANDOFF TASK-007 (449836104c57ea48a789d9473bd8de426556e4b2)
 Пункты 2 и 4 реализованы функционально (тесты проходят, файлы существуют), но изменения не включены в официальный коммит задачи (4498361 / 0db4948). Незакоммиченное рабочее дерево является риском: при потере или откате изменений реализация будет утрачена.
 
 **Обязательное действие для Owner:** закоммитить незакоммиченные файлы реализации (см. пункты 2 и 4) в отдельный коммит или инициировать TASK-008. owner_status остаётся PENDING до принятия решения владельцем проекта.
+
+
+## [OWNER_DECISION] TASK-007 — 2026-11-12 22:20
+task_id: TASK-007
+record_type: OWNER_DECISION
+author: Owner
+timestamp: 2026-11-12 22:20
+commit_hash: c9bfc58
+agents_md_sha256: 57bf75979bd8d3b17fef9c137c09f9b96bbf5504b8699080955c13da9c900b73
+changed_files: docs/coordination/task-board.md, docs/coordination/review-handoff.md
+verified_checks: check_coordination PASS; schema_validator --strict PASS; 53/53 tests OK; commit c9bfc58 captures all uncommitted implementation files (points 2 & 4) resolving audit warnings
+limitations: Решение Owner по итогам вердикта PASS WITH WARNINGS от Argon-Judge; все незакоммиченные файлы реализации зафиксированы в коммите c9bfc58; задача TASK-007 принята в полном объёме (ACCEPTED)
+predecessor_ref: AUDIT TASK-007 (4498361)
+
+### Решение владельца проекта (Owner)
+1. Все предупреждения аудита сняты: реализация сквозной валидации синтетики (test_15, PRODUCTION_SYNTHETIC_CONTAMINATION) и навыка synthetic-interview зафиксирована в коммите c9bfc58.
+2. Задача TASK-007 принята со статусом ACCEPTED.
+3. Утверждена установка релизного тега v0.1.2.
