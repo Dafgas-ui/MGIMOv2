@@ -965,6 +965,29 @@ class SchemaValidatorTest(unittest.TestCase):
         (standalone / "state.json").write_text(json.dumps(st_valid, ensure_ascii=False), encoding="utf-8")
         self.assertEqual(sv.validate_case(standalone, strict=True), [])
 
+    def test_15_synthetic_lineage_validation_in_production(self):
+        """Проверка сквозной валидации происхождения: боевой кейс не может строить proof_points на синтетике."""
+        state = copy.deepcopy(valid_state())
+        graph = copy.deepcopy(valid_evidence())
+        decision = copy.deepcopy(valid_decision())
+
+        # В учебном кейсе (educational_demo / synthetic_benchmark) синтетика разрешена
+        state["case_type"] = "educational_demo"
+        graph["sources"][0]["is_synthetic"] = True
+        graph["sources"][0]["origin"] = "synthetic_model"
+        # F-001 опирается на S-001 (синтетический источник)
+        # В решении proof_points[0] опирается на F-001
+        decision["communication_strategy"]["proof_points"][0]["evidence_refs"] = ["F-001"]
+        issues = sv.validate_documents(state, graph, decision)
+        codes = [i.code for i in issues]
+        self.assertNotIn("PRODUCTION_SYNTHETIC_CONTAMINATION", codes)
+
+        # Переключаем кейс в production -> валидатор ОБЯЗАН обнаружить загрязнение синтетикой по цепочке
+        state["case_type"] = "production"
+        issues_prod = sv.validate_documents(state, graph, decision)
+        codes_prod = [i.code for i in issues_prod]
+        self.assertIn("PRODUCTION_SYNTHETIC_CONTAMINATION", codes_prod)
+
 
 if __name__ == "__main__":
     unittest.main()

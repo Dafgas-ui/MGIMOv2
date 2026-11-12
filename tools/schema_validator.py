@@ -698,6 +698,7 @@ class EvidenceIndex:
                 else:
                     self.nodes[nid] = (section, i, node)
         self._stale = {}
+        self._synthetic_sources = {}
 
     def __contains__(self, nid):
         return nid in self.nodes
@@ -715,6 +716,31 @@ class EvidenceIndex:
         if section in ("calculations", "hypotheses"):
             return [r for _, r in _iter_refs(self.node(nid), "depends_on")]
         return []
+
+    def synthetic_sources_lineage(self, nid, _visiting=None):
+        """Возвращает список ID источников с синтетическим происхождением, от которых транзитивно зависит узел."""
+        if nid in self._synthetic_sources:
+            return self._synthetic_sources[nid]
+        if nid not in self.nodes:
+            return []
+        visiting = _visiting if _visiting is not None else set()
+        if nid in visiting:
+            return []
+        visiting.add(nid)
+        section, node = self.section(nid), self.node(nid)
+        synth = set()
+        if section == "sources":
+            is_synth = node.get("is_synthetic") is True or node.get("origin") in ("synthetic_benchmark", "synthetic_model")
+            if is_synth:
+                synth.add(nid)
+        elif section == "hypotheses" and node.get("is_synthetic_respondent") is True:
+            synth.add(nid)
+        for p in self.parents(nid):
+            synth.update(self.synthetic_sources_lineage(p, visiting))
+        visiting.discard(nid)
+        res = sorted(synth)
+        self._synthetic_sources[nid] = res
+        return res
 
     def is_self_stale(self, nid):
         section, node = self.section(nid), self.node(nid)
@@ -1319,6 +1345,24 @@ def validate_documents(state, graph, decision, schemas=None):
             issues.append(Issue("DECISION_STAGE_MISMATCH",
                                 f"решение утверждено человеком, но текущий этап кейса {stage}",
                                 "/workflow/current_stage", CASE_FILES["state"]))
+
+    # Сквозная проверка происхождения (Lineage): в боевом кейсе (case_type="production")
+    # нельзя строить доказательства стратегии и обещаний клиенту на полностью синтетических данных.
+    case_type = state.get("case_type") if isinstance(state, dict) else None
+    if case_type == "production" and isinstance(graph, dict) and isinstance(decision, dict):
+        idx = EvidenceIndex(graph)
+        cs = _dict(decision, "communication_strategy")
+        if cs is not None:
+            for k, pp in _iter_nodes(cs, "proof_points"):
+                for _, ref in _iter_refs(pp, "evidence_refs"):
+                    synths = idx.synthetic_sources_lineage(ref)
+                    if synths:
+                        issues.append(Issue("PRODUCTION_SYNTHETIC_CONTAMINATION",
+                                            f"в боевом кейсе (case_type=production) обещание в proof_points[{k}] "
+                                            f"опирается на синтетический источник ({', '.join(synths)}) через {ref}; "
+                                            f"в боевых продуктах обещания клиентам требуют эмпирических подтверждений",
+                                            f"/communication_strategy/proof_points/{k}/evidence_refs",
+                                            CASE_FILES["decision"], "WARNING"))
     return issues
 
 

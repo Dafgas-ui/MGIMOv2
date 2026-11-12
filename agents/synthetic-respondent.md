@@ -56,3 +56,7 @@
 ```
 
 Оркестратор сохраняет гипотезу в `evidence_graph.json` через команду `strategist_cli.py upsert-node --collection hypotheses`.
+
+## 5. Связанный навык
+
+Полная пошаговая процедура проведения интервью (гайд, настройка персоны, диалог, экстракция гипотез, guardrails) описана в навыке **`skills/synthetic-interview/SKILL.md`**.

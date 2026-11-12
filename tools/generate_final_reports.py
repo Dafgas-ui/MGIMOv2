@@ -11,27 +11,45 @@ sys.path.insert(0, str(ROOT / "tools"))
 
 from build_native_docx import DocxBuilder
 
+def _parse_task_board():
+    board_path = ROOT / "docs" / "coordination" / "task-board.md"
+    rows = []
+    if board_path.is_file():
+        for line in board_path.read_text(encoding="utf-8").splitlines():
+            line = line.strip()
+            if line.startswith("| TASK-"):
+                parts = [p.strip() for p in line.split("|")[1:-1]]
+                if len(parts) >= 8:
+                    rows.append(parts[:8])
+    return rows
+
 def generate_audit_document():
     doc = DocxBuilder("Полный системный аудит архитектуры и приёмки MVP")
     
     doc.add_title("MGIMO AI Challenge 2026: «Стратег Фабрики продуктов»")
     doc.add_paragraph("Официальный отчёт сквозного системного аудита архитектуры, координации и приёмки MVP", bold=True, color="003366")
-    doc.add_paragraph("Версия репозитория: v0.1.1-hotfix | Дата фиксации: 10 ноября 2026 года | Статус: ВСЕ ЭТАПЫ ACCEPTED")
+    try:
+        current_sha = subprocess.check_output(["git", "rev-parse", "--short", "HEAD"], cwd=ROOT, text=True).strip()
+    except Exception:
+        current_sha = "unknown"
+    doc.add_paragraph(f"Версия репозитория: commit {current_sha} | Дата фиксации: 11 ноября 2026 года | Статус координации: сверено с task-board.md")
     
     doc.add_heading_1("1. Сводная ведомость реализации задач (task-board.md)")
-    doc.add_paragraph("В проекте реализована гибридная координация через общую файловую память и Git с разделением прав на запись. Ни одна задача не принималась без тройного независимого подтверждения.")
+    doc.add_paragraph("В проекте реализована гибридная координация через общую файловую память и Git с разделением прав на запись. Ниже приведены фактические статусы задач из актуального реестра координации:")
     
     headers = ["Task ID", "Наименование задачи", "Исполнитель", "Аудитор", "Dev Status", "Audit Status", "Owner Status", "Commit"]
-    rows = [
-        ["TASK-000", "Каркас репозитория, Git, AGENTS.md, координация", "Sonnet-Staff", "Argon-Judge", "READY_FOR_REVIEW", "PASS", "ACCEPTED", "d6e54f7"],
-        ["TASK-001", "JSON-схемы состояния, Evidence Graph и решений", "Opus-Core", "Argon-Judge", "READY_FOR_REVIEW", "PASS", "ACCEPTED", "c2b3aca"],
-        ["TASK-002", "Ядро Python CLI strategist_cli.py и unit-тесты", "Opus-Core", "Argon-Judge", "READY_FOR_REVIEW", "PASS", "ACCEPTED", "b8dca7a"],
-        ["TASK-003", "Хук автовосстановления .agents/hooks.json", "Sonnet-Staff", "Argon-Judge", "READY_FOR_REVIEW", "PASS", "ACCEPTED", "d6f669c"],
-        ["TASK-004", "Оркестратор, база знаний knowledge/ и 4 навыка", "Opus-Mind", "Argon-Judge", "READY_FOR_REVIEW", "PASS", "ACCEPTED", "db0ffdc"],
-        ["TASK-005", "Субагенты в agents/ и демо-кейс demo_mvp", "Opus-Mind", "Argon-Judge", "READY_FOR_REVIEW", "PASS", "ACCEPTED", "cf9eaa8"],
-        ["TASK-006", "Сквозные испытания T01–T12 и релиз MVP", "Argon-Judge", "Argon-Prime", "READY_FOR_REVIEW", "PASS", "ACCEPTED", "e0de896"],
-        ["TASK-007", "Локализация источников, метаданные отчетов, синхронизация версий", "Opus-Core", "Argon-Judge", "READY_FOR_REVIEW", "PASS", "ACCEPTED", "v0.1.1-hotfix"],
-    ]
+    rows = _parse_task_board()
+    if not rows:
+        rows = [
+            ["TASK-000", "Каркас репозитория, Git, AGENTS.md, координация", "Sonnet-Staff", "Argon-Judge", "READY_FOR_REVIEW", "PASS", "ACCEPTED", "d6e54f7"],
+            ["TASK-001", "JSON-схемы состояния, Evidence Graph и решений", "Opus-Core", "Argon-Judge", "READY_FOR_REVIEW", "PASS", "ACCEPTED", "c2b3aca"],
+            ["TASK-002", "Ядро Python CLI strategist_cli.py и unit-тесты", "Opus-Core", "Argon-Judge", "READY_FOR_REVIEW", "PASS", "ACCEPTED", "b8dca7a"],
+            ["TASK-003", "Хук автовосстановления .agents/hooks.json", "Sonnet-Staff", "Argon-Judge", "READY_FOR_REVIEW", "PASS", "ACCEPTED", "d6f669c"],
+            ["TASK-004", "Оркестратор, база знаний knowledge/ и 4 навыка", "Opus-Mind", "Argon-Judge", "READY_FOR_REVIEW", "PASS", "ACCEPTED", "db0ffdc"],
+            ["TASK-005", "Субагенты в agents/ и демо-кейс demo_mvp", "Opus-Mind", "Argon-Judge", "READY_FOR_REVIEW", "PASS", "ACCEPTED", "cf9eaa8"],
+            ["TASK-006", "Сквозные испытания T01–T12 и релиз MVP", "Argon-Judge", "Argon-Prime", "READY_FOR_REVIEW", "PASS", "ACCEPTED", "e0de896"],
+            ["TASK-007", "Локализация источников, метаданные отчетов, синхронизация версий", "Opus-Core", "Argon-Judge", "READY_FOR_REVIEW", "PENDING", "PENDING", "4498361"],
+        ]
     doc.add_table(headers, rows)
 
     doc.add_heading_1("2. Детальный аудит выполненных шагов (Шаги 0 – 5)")

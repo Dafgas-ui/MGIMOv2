@@ -207,8 +207,8 @@
     },
     {
       "id": "C-002",
-      "description": "Расчет срока окупаемости привлечения (Payback) при семейном онбординге с удержанием M2 68.4%",
-      "formula": "payback_months = CAC / (ARPU * gross_margin_rate * avg_retention_factor)",
+      "description": "Оценка срока окупаемости CAC при подписке 199 руб./мес. и допущениях: маржинальность 76% (после биллинга/налогов) и собираемость 94%",
+      "formula": "payback_months = CAC / (ARPU * gross_margin_rate * payment_collection_rate) [Базовый: 485.7/(199*0.76*0.94)=3.4 мес; Пессимистичный (margin 65%, collection 90%): 4.2 мес; Оптимистичный (margin 80%, collection 96%): 3.2 мес]",
       "depends_on": [
         "F-005",
         "F-006"
@@ -220,8 +220,8 @@
     },
     {
       "id": "C-003",
-      "description": "Расчет мультипликатора прироста завершения онбординга при снижении дропоффа с 77.2% до 40.0%",
-      "formula": "completion_multiplier = (1 - 0.400) / (1 - 0.772)",
+      "description": "Расчет теоретического мультипликатора прохождения онбординга при целевом снижении дропоффа экрана 2 с 77.2% до 40.0% (метрика воронки, не равна росту оплат)",
+      "formula": "onboarding_completion_ratio = (1 - target_dropoff) / (1 - baseline_dropoff) = (1 - 0.40) / (1 - 0.772)",
       "depends_on": [
         "F-001",
         "F-002",
