@@ -1,0 +1,168 @@
+{
+  "case_id": "eval_b2b_roaming",
+  "schema_version": "1.0",
+  "updated_at": "2026-11-12T22:30:00+03:00",
+  "research_questions": [
+    {
+      "id": "Q-001",
+      "question": "Какова доля замещения роуминга МегаФона альтернативами (eSIM/местные SIM) в целевых странах?",
+      "decision_impact": "Определяет географический приоритет продуктового предложения",
+      "status": "answered",
+      "answer_refs": [
+        "F-001"
+      ]
+    },
+    {
+      "id": "Q-002",
+      "question": "Какой главный барьер останавливает бизнес от использования роуминга МегаФона?",
+      "decision_impact": "Определяет формулировку ценностного предложения и фичи B2B-продукта",
+      "status": "answered",
+      "answer_refs": [
+        "F-002",
+        "F-003"
+      ]
+    },
+    {
+      "id": "Q-003",
+      "question": "Сходится ли юнит-экономика общего пула трафика при оптовом межоператорском выкупе?",
+      "decision_impact": "Определяет выбор между пакетным тарифом и закрытием направления",
+      "status": "answered",
+      "answer_refs": [
+        "C-001",
+        "C-002"
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "id": "S-001",
+      "title": "Выгрузка статистики бизнес-поездок абонентов B2B за 2026 год",
+      "source_type": "spreadsheet",
+      "location": "sources/b2b_trips_2026.csv",
+      "trust_boundary": "untrusted_data",
+      "verification_level": "content_verified",
+      "content_hash": "sha256:b2200ec34be4367936edabd0b2b79145851156aef3d714343d8c96c9cb8d3db9",
+      "version": "1.0",
+      "retrieved_at": "2026-11-12T22:30:00+03:00",
+      "is_synthetic": false,
+      "origin": "empirical",
+      "notes": "Первичные данные биллинга корпоративных абонентов"
+    },
+    {
+      "id": "S-002",
+      "title": "Бенчмарк тарифов международных туристических eSIM (Q3-Q4 2026)",
+      "source_type": "document",
+      "location": "sources/competitor_esim_benchmarks.md",
+      "trust_boundary": "untrusted_data",
+      "verification_level": "content_verified",
+      "content_hash": "sha256:c8fb866ab5bd096b74ff4ef20230dc4a9c5cab21dd05102b25191199f6ed99a3",
+      "version": "1.0",
+      "retrieved_at": "2026-11-12T22:30:00+03:00",
+      "is_synthetic": false,
+      "origin": "empirical",
+      "notes": "Анализ предложений Airalo, Yesim, Drimsim"
+    },
+    {
+      "id": "S-003",
+      "title": "Глубинные интервью с финансовыми директорами МСБ (8 респондентов)",
+      "source_type": "interview",
+      "location": "sources/b2b_customer_interviews.md",
+      "trust_boundary": "untrusted_data",
+      "verification_level": "content_verified",
+      "content_hash": "sha256:c958fbe06ec5b949c5d9e3dc1e7cff0c422ca2801645424c6de8126736d0554c",
+      "version": "1.0",
+      "retrieved_at": "2026-11-12T22:30:00+03:00",
+      "is_synthetic": true,
+      "origin": "synthetic_benchmark",
+      "notes": "Учебные данные для демонстрационного MVP МегаФон"
+    }
+  ],
+  "findings": [
+    {
+      "id": "F-001",
+      "statement": "В Китае (71.2%), Турции (62.1%) и ОАЭ (58.6%) более половины командировок перешли на альтернативные eSIM/местные SIM из-за дороговизны розничного роуминга",
+      "source_refs": [
+        "S-001"
+      ],
+      "exact_locator": "sources/b2b_trips_2026.csv, строки UAE, Turkey, China, колонка esim_substitute_share_pct",
+      "metric_definition": {
+        "metric_name": "esim_substitute_share",
+        "numerator": "поездки с замещением на сторонние SIM/eSIM",
+        "denominator": "все поездки в страну",
+        "period": "2026",
+        "unit": "%",
+        "value": 64.0
+      },
+      "validity_status": "valid"
+    },
+    {
+      "id": "F-002",
+      "statement": "Туристические eSIM не предоставляют закрывающих документов РФ (УПД, счета-фактуры) и требуют оплаты зарубежными картами сотрудников",
+      "source_refs": [
+        "S-002"
+      ],
+      "exact_locator": "sources/competitor_esim_benchmarks.md, раздел 1, п. 1-2",
+      "validity_status": "valid"
+    },
+    {
+      "id": "F-003",
+      "statement": "Главный барьер подключения роуминга — страх непредсказуемого овербиллинга из-за фонового интернет-трафика смартфона (Учебные данные / Synthetic Benchmark)",
+      "source_refs": [
+        "S-003"
+      ],
+      "exact_locator": "sources/b2b_customer_interviews.md, цитата 1 и вывод 3",
+      "validity_status": "valid"
+    }
+  ],
+  "calculations": [
+    {
+      "id": "C-001",
+      "description": "Оценка среднего потребления трафика на 1 командировку в дальних направлениях (ОАЭ, Турция, Китай)",
+      "formula": "weighted_avg_gb = sum(trips * avg_data_gb) / sum(trips)",
+      "depends_on": [
+        "F-001"
+      ],
+      "result_value": 5.1,
+      "unit": "GB",
+      "reproduce_command": "python -c \"print(round((8900*4.1 + 7400*5.2 + 6100*6.5)/22400, 1))\"",
+      "validity_status": "valid"
+    },
+    {
+      "id": "C-002",
+      "description": "Расчет валовой маржи корпоративного пула 50 ГБ при оптовой себестоимости 215 руб./ГБ и продаже 490 руб./ГБ",
+      "formula": "margin_pct = (price_per_gb - wholesale_cost_gb) / price_per_gb",
+      "depends_on": [
+        "F-001"
+      ],
+      "result_value": 56.1,
+      "unit": "%",
+      "reproduce_command": "python -c \"print(round((490 - 215) / 490 * 100, 1))\"",
+      "validity_status": "valid"
+    }
+  ],
+  "hypotheses": [
+    {
+      "id": "H-001",
+      "statement": "Предоставление единого корпоративного пула трафика с жестким стоп-лимитом вернет до 45% компаний из eSIM в роуминг МегаФона благодаря закрывающим документам",
+      "kind": "hypothesis",
+      "is_synthetic_respondent": false,
+      "depends_on": [
+        "F-001",
+        "F-002"
+      ],
+      "confidence": "medium",
+      "verification_method": "Пилотный запуск на 50 корпоративных клиентах сегмента МСБ с командировками в ОАЭ и Китай",
+      "validity_status": "valid"
+    }
+  ],
+  "contradictions": [],
+  "knowledge_gaps": [
+    {
+      "id": "G-001",
+      "missing_info": "Точная динамика цен местных сотовых операторов Китая при покупке физических SIM на месте",
+      "why_unknown": "Языковой барьер и закрытость прямых B2B-тарифов китайских операторов",
+      "impact_on_decision": "Низкий — корпоративные клиенты неохотно тратят время командированных на поиск местных сим-карт в неанглоязычной среде",
+      "mitigation_or_next_step": "Мониторинг предложений операторов China Mobile и China Unicom через регионального партнера"
+    }
+  ]
+}

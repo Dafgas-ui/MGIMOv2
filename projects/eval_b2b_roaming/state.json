@@ -1,0 +1,138 @@
+{
+  "case_id": "eval_b2b_roaming",
+  "schema_version": "1.0",
+  "created_at": "2026-11-12T22:23:09+03:00",
+  "updated_at": "2026-11-12T22:38:02+03:00",
+  "problem_framing": {
+    "raw_request": "Подумай над продуктовой стратегией корпоративного роуминга для малого бизнеса: сейчас компании переходят на локальные eSIM других стран или мессенджеры, выручка направления падает на 18% в год.",
+    "clarified_problem": "Отток корпоративных клиентов МСБ в зарубежные туристические eSIM из-за непредсказуемости тарификации и отсутствия закрывающих документов для бухгалтерии",
+    "goal": "Остановить падение выручки роуминга МСБ (-18% YoY) за счёт запуска пула трафика с централизованной корпоративной оплатой для командировок в СНГ, ОАЭ, Турцию и Китай",
+    "decision_recipient": "Руководитель департамента корпоративных продуктов МегаФона (B2B)",
+    "constraints": [
+      "Техническая совместимость с существующим B2B-биллингом МегаФона",
+      "Запрет на демпинг ниже межоператорской себестоимости передачи данных",
+      "Ограничение на бюджет пилотного запуска: до 2.5 млн руб."
+    ],
+    "available_data_summary": "Статистика командировок B2B за 2026 год (S-001), бенчмарк тарифов eSIM (S-002), глубинные интервью с финдиректорами МСБ (S-003)",
+    "pending_clarifying_questions": []
+  },
+  "workflow": {
+    "current_stage": "HUMAN_DECISION",
+    "completed_stages": [
+      "INTAKE",
+      "RESEARCH_PLANNING",
+      "EVIDENCE_COLLECTION",
+      "EVIDENCE_VALIDATION",
+      "OPTIONS_GENERATION",
+      "STRATEGY_DESIGN",
+      "INDEPENDENT_REVIEW"
+    ],
+    "stage_history": [
+      {
+        "from_stage": null,
+        "to_stage": "INTAKE",
+        "timestamp": "2026-11-12T22:23:00+03:00",
+        "transition_type": "start",
+        "reason": "Инициализация кейса"
+      },
+      {
+        "from_stage": "INTAKE",
+        "to_stage": "RESEARCH_PLANNING",
+        "timestamp": "2026-11-12T22:24:00+03:00",
+        "transition_type": "forward",
+        "reason": "Переход на этап RESEARCH_PLANNING"
+      },
+      {
+        "from_stage": "RESEARCH_PLANNING",
+        "to_stage": "EVIDENCE_COLLECTION",
+        "timestamp": "2026-11-12T22:25:00+03:00",
+        "transition_type": "forward",
+        "reason": "Переход на этап EVIDENCE_COLLECTION"
+      },
+      {
+        "from_stage": "EVIDENCE_COLLECTION",
+        "to_stage": "EVIDENCE_VALIDATION",
+        "timestamp": "2026-11-12T22:26:00+03:00",
+        "transition_type": "forward",
+        "reason": "Переход на этап EVIDENCE_VALIDATION"
+      },
+      {
+        "from_stage": "EVIDENCE_VALIDATION",
+        "to_stage": "OPTIONS_GENERATION",
+        "timestamp": "2026-11-12T22:27:00+03:00",
+        "transition_type": "forward",
+        "reason": "Переход на этап OPTIONS_GENERATION"
+      },
+      {
+        "from_stage": "OPTIONS_GENERATION",
+        "to_stage": "STRATEGY_DESIGN",
+        "timestamp": "2026-11-12T22:28:00+03:00",
+        "transition_type": "forward",
+        "reason": "Переход на этап STRATEGY_DESIGN"
+      },
+      {
+        "from_stage": "STRATEGY_DESIGN",
+        "to_stage": "INDEPENDENT_REVIEW",
+        "timestamp": "2026-11-12T22:29:00+03:00",
+        "transition_type": "forward",
+        "reason": "Переход на этап INDEPENDENT_REVIEW"
+      },
+      {
+        "from_stage": "INDEPENDENT_REVIEW",
+        "to_stage": "HUMAN_DECISION",
+        "timestamp": "2026-11-12T22:30:00+03:00",
+        "transition_type": "forward",
+        "reason": "Переход на этап HUMAN_DECISION"
+      }
+    ],
+    "awaiting_human_approval": {
+      "is_awaiting": true,
+      "reason": "Требуется утверждение финальной продуктовой стратегии B2B-роуминга и плана валидации человеком"
+    }
+  },
+  "checkpoints_and_recovery": {
+    "last_completed_operation_id": null,
+    "in_progress_operation": null,
+    "artifacts_integrity": [
+      {
+        "path": "evidence/evidence_graph.json",
+        "sha256": "0eafe25e0d9fe8834d137fe514180a6d792d75207e668b157389a9885a91af76",
+        "recorded_at": "2026-11-12T22:38:02+03:00"
+      },
+      {
+        "path": "decisions/strategy_decision.json",
+        "sha256": "0ce1892023ace9587e69d3f50d393e7eee3378461feac9e8903ba292ced645d0",
+        "recorded_at": "2026-11-12T22:38:02+03:00"
+      },
+      {
+        "path": "outputs/01_research_and_evidence.md",
+        "sha256": "8a7c0778b31db87b4ac08494cb4df8cd45a745249c2eb0fe6fa1529cda5445ee",
+        "recorded_at": "2026-11-12T22:38:02+03:00"
+      },
+      {
+        "path": "outputs/02_alternatives_comparison.md",
+        "sha256": "2d41d511cd644b726af48da936f83121d548705f3252a5a49f5104552cb99056",
+        "recorded_at": "2026-11-12T22:38:02+03:00"
+      },
+      {
+        "path": "outputs/03_product_and_comm_strategy.md",
+        "sha256": "f250698232ef27b5f53c529e0ff2c01f3191e6d1670dafcf295d051b4788a036",
+        "recorded_at": "2026-11-12T22:38:02+03:00"
+      },
+      {
+        "path": "outputs/04_validation_plan_and_governance.md",
+        "sha256": "2469a18c8196806e25050033699dca5caeacad016c4152603ce68ab5dcbb9f21",
+        "recorded_at": "2026-11-12T22:38:02+03:00"
+      }
+    ]
+  },
+  "cost_and_usage_ledger": {
+    "entries": [],
+    "totals": {
+      "total_duration_sec": 0.0,
+      "total_tokens": 0,
+      "total_estimated_cost_usd": 0.0
+    }
+  },
+  "case_type": "educational_demo"
+}
