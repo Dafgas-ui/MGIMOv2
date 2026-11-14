@@ -1,0 +1,155 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800" width="1200" height="800">
+  <defs>
+    <style>
+      .bg { fill: #F4F6F9; }
+      .device-frame { fill: #FFFFFF; stroke: #D0D7DE; stroke-width: 2; rx: 24; }
+      .header-bar { fill: #00B956; rx: 4; }
+      .screen-title { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 18px; font-weight: 700; fill: #1D252C; }
+      .screen-sub { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 13px; fill: #6B7785; }
+      .primary-btn { fill: #00B956; rx: 8; cursor: pointer; }
+      .btn-text { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 14px; font-weight: 600; fill: #FFFFFF; text-anchor: middle; }
+      .input-box { fill: #F0F3F7; stroke: #CBD4E1; stroke-width: 1.5; rx: 6; }
+      .input-text { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 13px; fill: #334155; }
+      .warning-box { fill: #FFF1F2; stroke: #F43F5E; stroke-width: 1.5; rx: 8; }
+      .warning-title { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 14px; font-weight: 700; fill: #9F1239; }
+      .warning-desc { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 12px; fill: #881337; }
+      .arrow { stroke: #00B956; stroke-width: 3; stroke-linecap: round; fill: none; }
+      .badge-drop { fill: #E11D48; rx: 12; }
+      .badge-text { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 12px; font-weight: 700; fill: #FFFFFF; text-anchor: middle; }
+      .label-caption { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 14px; font-weight: 700; fill: #0F172A; text-anchor: middle; }
+    </style>
+  </defs>
+
+  <!-- Background Canvas -->
+  <rect width="1200" height="800" class="bg"/>
+
+  <!-- Top Title -->
+  <text x="600" y="50" text-anchor="middle" font-family="sans-serif" font-size="22" font-weight="800" fill="#0F172A">
+    UX-аудит воронки онбординга «Семейный Щит» — Точка критического отвала пользователей
+  </text>
+  <text x="600" y="78" text-anchor="middle" font-family="sans-serif" font-size="14" fill="#64748B">
+    Анализ экранов мобильного приложения: МегаФон Защита семьи (v2.4.0, Q3 2026)
+  </text>
+
+  <!-- ==================== SCREEN 1: WELCOME & PROMO ==================== -->
+  <g id="screen-1-welcome" transform="translate(60, 110)">
+    <!-- Device Frame -->
+    <rect x="0" y="0" width="320" height="600" class="device-frame"/>
+    <rect x="120" y="10" width="80" height="5" rx="2.5" fill="#CBD4E1"/>
+    <!-- Screen Header -->
+    <rect x="20" y="35" width="280" height="8" class="header-bar"/>
+    <!-- Illustration Placeholder -->
+    <rect x="40" y="70" width="240" height="160" rx="12" fill="#E8F8F0"/>
+    <circle cx="160" cy="140" r="45" fill="#00B956" opacity="0.2"/>
+    <!-- Shield Icon in Center -->
+    <path d="M160 115 L185 125 V150 C185 165 160 175 160 175 C160 175 135 165 135 150 V125 Z" fill="#00B956"/>
+    <!-- Text Elements -->
+    <text x="160" y="260" text-anchor="middle" class="screen-title">Защитите близких</text>
+    <text x="160" y="285" text-anchor="middle" class="screen-sub">Блокировка спама, фишинга</text>
+    <text x="160" y="305" text-anchor="middle" class="screen-sub">и мошенников для всей семьи</text>
+    <!-- Value Bullets -->
+    <circle cx="45" cy="350" r="5" fill="#00B956"/>
+    <text x="60" y="354" class="input-text">Автоматический определитель</text>
+    <circle cx="45" cy="385" r="5" fill="#00B956"/>
+    <text x="60" y="389" class="input-text">Уведомления об угрозах</text>
+    <circle cx="45" cy="420" r="5" fill="#00B956"/>
+    <text x="60" y="424" class="input-text">До 5 номеров в одной подписке</text>
+    <!-- CTA Button -->
+    <rect id="screen-1-cta" x="30" y="510" width="260" height="48" class="primary-btn"/>
+    <text x="160" y="540" class="btn-text">Подключить 7 дней бесплатно</text>
+    <!-- Label -->
+    <text x="160" y="630" class="label-caption">Экран 1: Промо и старт</text>
+    <text x="160" y="650" font-family="sans-serif" font-size="12" fill="#10B981" text-anchor="middle">Конверсия в клик: 94.2%</text>
+  </g>
+
+  <!-- Transition Arrow 1 -> 2 -->
+  <path d="M 400 380 L 430 380" class="arrow"/>
+  <polygon points="435,380 425,374 425,386" fill="#00B956"/>
+
+  <!-- ==================== SCREEN 2: HARD SMS BARRIER (CRITICAL DROP) ==================== -->
+  <g id="screen-2-modal-barrier" transform="translate(440, 110)">
+    <!-- Device Frame with Red Alert Highlight -->
+    <rect x="0" y="0" width="320" height="600" class="device-frame" stroke="#E11D48" stroke-width="3"/>
+    <rect x="120" y="10" width="80" height="5" rx="2.5" fill="#CBD4E1"/>
+    <!-- Screen Header -->
+    <text x="30" y="55" font-family="sans-serif" font-size="16" font-weight="700" fill="#1D252C">Привязка родственника</text>
+    <!-- Subtitle -->
+    <text x="30" y="85" class="screen-sub">Шаг 1 из 3: Подтверждение согласия</text>
+    <!-- Input Phone Field -->
+    <text x="30" y="125" font-family="sans-serif" font-size="12" font-weight="600" fill="#475569">Номер телефона родственника:</text>
+    <rect id="input-phone-relative" x="30" y="135" width="260" height="42" class="input-box"/>
+    <text x="45" y="161" class="input-text">+7 (926) •••-••-••</text>
+    <!-- Critical Friction Element: SMS Alert Modal -->
+    <rect id="friction-sms-modal" x="20" y="200" width="280" height="165" class="warning-box"/>
+    <circle cx="45" cy="225" r="12" fill="#F43F5E"/>
+    <text x="45" y="230" font-family="sans-serif" font-size="14" font-weight="900" fill="#FFFFFF" text-anchor="middle">!</text>
+    <text x="65" y="230" class="warning-title">Требуется код из SMS</text>
+    <text x="35" y="260" class="warning-desc">Мы отправили 4-значный код родственнику.</text>
+    <text x="35" y="280" class="warning-desc">Позвоните ему прямо сейчас и введите код ниже:</text>
+    <!-- 4 Digit Code Inputs -->
+    <rect x="40" y="300" width="45" height="45" class="input-box" stroke="#F43F5E"/>
+    <rect x="95" y="300" width="45" height="45" class="input-box" stroke="#F43F5E"/>
+    <rect x="150" y="300" width="45" height="45" class="input-box" stroke="#F43F5E"/>
+    <rect x="205" y="300" width="45" height="45" class="input-box" stroke="#F43F5E"/>
+    <!-- Friction Reasons Note -->
+    <text x="30" y="400" font-family="sans-serif" font-size="11" fill="#64748B">• 77.2% пользователей закрывают приложение здесь</text>
+    <text x="30" y="420" font-family="sans-serif" font-size="11" fill="#64748B">• Родители боятся диктовать SMS-коды детям</text>
+    <text x="30" y="440" font-family="sans-serif" font-size="11" fill="#64748B">• Абонент откладывает настройку и забывает о ней</text>
+    <!-- Disabled Next Button -->
+    <rect x="30" y="510" width="260" height="48" rx="8" fill="#94A3B8"/>
+    <text x="160" y="540" class="btn-text">Подтвердить и продолжить</text>
+    <!-- Dropoff Badge -->
+    <rect x="80" y="565" width="160" height="26" class="badge-drop"/>
+    <text x="160" y="582" class="badge-text">ОТВАЛ 77.2% КЛИЕНТОВ</text>
+    <!-- Label -->
+    <text x="160" y="630" class="label-caption">Экран 2: Жёсткий барьер SMS</text>
+    <text x="160" y="650" font-family="sans-serif" font-size="12" font-weight="700" fill="#E11D48" text-anchor="middle">Главная причина M2 Churn (18.5%)</text>
+  </g>
+
+  <!-- Transition Arrow 2 -> 3 -->
+  <path d="M 780 380 L 810 380" class="arrow" stroke="#94A3B8"/>
+  <polygon points="815,380 805,374 805,386" fill="#94A3B8"/>
+
+  <!-- ==================== SCREEN 3: CONFIGURATION (UNREACHED) ==================== -->
+  <g id="screen-3-config" transform="translate(820, 110)">
+    <!-- Device Frame (Semi-transparent / unreached) -->
+    <rect x="0" y="0" width="320" height="600" class="device-frame" opacity="0.85"/>
+    <rect x="120" y="10" width="80" height="5" rx="2.5" fill="#CBD4E1"/>
+    <!-- Header -->
+    <text x="30" y="55" font-family="sans-serif" font-size="16" font-weight="700" fill="#64748B">Категории защиты</text>
+    <text x="30" y="80" class="screen-sub">Шаг 2 из 3 (доходит лишь 22.8%)</text>
+    <!-- Feature Toggles -->
+    <rect x="30" y="110" width="260" height="60" rx="8" fill="#F8FAFC" stroke="#E2E8F0"/>
+    <text x="45" y="135" font-family="sans-serif" font-size="13" font-weight="600" fill="#475569">Анти-спам звонков</text>
+    <rect x="230" y="125" width="45" height="24" rx="12" fill="#00B956"/>
+    <circle cx="262" cy="137" r="9" fill="#FFFFFF"/>
+
+    <rect x="30" y="185" width="260" height="60" rx="8" fill="#F8FAFC" stroke="#E2E8F0"/>
+    <text x="45" y="210" font-family="sans-serif" font-size="13" font-weight="600" fill="#475569">Блокировка фишинга</text>
+    <rect x="230" y="200" width="45" height="24" rx="12" fill="#00B956"/>
+    <circle cx="262" cy="212" r="9" fill="#FFFFFF"/>
+
+    <rect x="30" y="260" width="260" height="60" rx="8" fill="#F8FAFC" stroke="#E2E8F0"/>
+    <text x="45" y="285" font-family="sans-serif" font-size="13" font-weight="600" fill="#475569">Банковские алерты</text>
+    <rect x="230" y="275" width="45" height="24" rx="12" fill="#CBD4E1"/>
+    <circle cx="243" cy="287" r="9" fill="#FFFFFF"/>
+
+    <!-- Bottom Finish Button -->
+    <rect x="30" y="510" width="260" height="48" class="primary-btn" opacity="0.6"/>
+    <text x="160" y="540" class="btn-text">Завершить настройку</text>
+    <!-- Label -->
+    <text x="160" y="630" class="label-caption">Экран 3: Настройка параметров</text>
+    <text x="160" y="650" font-family="sans-serif" font-size="12" fill="#64748B" text-anchor="middle">Доходят только 22.8% начавших</text>
+  </g>
+
+  <!-- Bottom Legend / Verification Locator Box -->
+  <g id="locator-metadata" transform="translate(60, 710)">
+    <rect width="1080" height="60" rx="8" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="1"/>
+    <text x="20" y="25" font-family="monospace" font-size="12" fill="#0F172A" font-weight="700">
+      SOURCE_LOCATOR: projects/demo_mvp/sources/onboarding_screen_flow.svg#screen-2-modal-barrier
+    </text>
+    <text x="20" y="45" font-family="sans-serif" font-size="12" fill="#475569">
+      Визуальное доказательство барьера: модальное окно SMS-подтверждения (#friction-sms-modal, Y:200..365) провоцирует 77.2% отказов от привязки номера.
+    </text>
+  </g>
+</svg>

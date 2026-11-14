@@ -32,7 +32,8 @@
         "F-004",
         "F-005",
         "C-002",
-        "H-002"
+        "H-002",
+        "F-007"
       ]
     }
   ],
@@ -86,6 +87,20 @@
       "is_synthetic": true,
       "origin": "synthetic_benchmark",
       "notes": "14 глубинных интервью, воронка 5 экранов онбординга и 1 синтетическая сессия (Учебные синтетические данные / Synthetic Benchmark)"
+    },
+    {
+      "id": "S-005",
+      "title": "Векторная схема и UX-аудит экранов воронки онбординга мобильного приложения",
+      "source_type": "image_ux",
+      "location": "projects/demo_mvp/sources/onboarding_screen_flow.svg",
+      "trust_boundary": "untrusted_data",
+      "verification_level": "content_verified",
+      "content_hash": "sha256:d11eed388a2811505de761bbf57c3ee9b23856cefbb2deacc8ba20a85b64fc57",
+      "version": "2.4.0",
+      "retrieved_at": "2026-11-14T20:44:00+03:00",
+      "is_synthetic": false,
+      "origin": "empirical",
+      "notes": "Схема экранов онбординга (viewBox 0 0 1200 800): экран 1 (промо), экран 2 (SMS-барьер #friction-sms-modal), экран 3 (категории)"
     }
   ],
   "findings": [
@@ -189,6 +204,15 @@
         "unit": "RUB",
         "value": 485.7
       },
+      "validity_status": "valid"
+    },
+    {
+      "id": "F-007",
+      "statement": "Композиция экрана 2 онбординга (#friction-sms-modal) требует обязательного ввода 4-значного SMS-кода родственника на шаге 1, блокируя переход к настройкам категорий защиты (отвал 77.2% пользователей).",
+      "source_refs": [
+        "S-005"
+      ],
+      "exact_locator": "onboarding_screen_flow.svg#friction-sms-modal (viewBox 0 0 1200 800, Y:200..365)",
       "validity_status": "valid"
     }
   ],

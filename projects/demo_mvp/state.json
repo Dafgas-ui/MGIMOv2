@@ -2,7 +2,7 @@
   "case_id": "demo_mvp",
   "schema_version": "1.0",
   "created_at": "2026-11-09T17:22:11+03:00",
-  "updated_at": "2026-11-11T15:58:37+03:00",
+  "updated_at": "2026-11-14T21:00:37+03:00",
   "problem_framing": {
     "raw_request": "Падает M2 Retention сервиса Семейный Щит, аналитика дает противоречивые данные по конверсии 4.2% vs 18.5%, команда спорит: запускать ИИ-детектор дипфейков, пересобрать семейный онбординг, оставить как есть или закрыть витрину",
     "clarified_problem": "Падение удержания M2 и методологическое расхождение воронки конверсии при выборе между дорогой ИИ-функциональностью и оптимизацией семейного онбординга",
@@ -105,33 +105,33 @@
     "artifacts_integrity": [
       {
         "path": "evidence/evidence_graph.json",
-        "sha256": "8522d54c781227ef4debecadb71bfdb43b9216dd12e3a1911526dbc7311078a2",
-        "recorded_at": "2026-11-11T15:58:37+03:00"
+        "sha256": "780f316f7390fd6b82ce2b11df375c876de18ff9a47d2b143b3d27ed12f1008c",
+        "recorded_at": "2026-11-14T21:00:37+03:00"
       },
       {
         "path": "decisions/strategy_decision.json",
-        "sha256": "b52a7561cce76a85bc62976442d8d5685f98e86ad857f7a3b376680891ae1c26",
-        "recorded_at": "2026-11-11T15:58:37+03:00"
+        "sha256": "e8ed49dc6e4be520a03d968e01d518084bf553273d24095a70995e86696616c5",
+        "recorded_at": "2026-11-14T21:00:37+03:00"
       },
       {
         "path": "outputs/01_research_and_evidence.md",
-        "sha256": "df98438ca43e7be57ade9c9667f2701fb6866c2747df642e003f0d537648a550",
-        "recorded_at": "2026-11-11T15:58:37+03:00"
+        "sha256": "29c9eb18963adc56f501fb154b1dbb58f781bf44368fbbf6843cabdb6d75858b",
+        "recorded_at": "2026-11-14T21:00:37+03:00"
       },
       {
         "path": "outputs/02_alternatives_comparison.md",
-        "sha256": "0096b12342eb61c12c477dbff10ccfa018b02edc58b44edd856f4515b8fd32ab",
-        "recorded_at": "2026-11-11T15:58:37+03:00"
+        "sha256": "edfe213b89611bf0afa04e66eda9236ded717db50eef9724fa16ea5d1dbe9c5f",
+        "recorded_at": "2026-11-14T21:00:37+03:00"
       },
       {
         "path": "outputs/03_product_and_comm_strategy.md",
-        "sha256": "3c7ba4c6a27c47041b18916cf5df5ea3c639d183032688b2338bb3c6a4e8b78d",
-        "recorded_at": "2026-11-11T15:58:37+03:00"
+        "sha256": "49c565ffcf6913b10e1a62e506f633389808103f4d4c9511d2fab26a08ccc9ab",
+        "recorded_at": "2026-11-14T21:00:37+03:00"
       },
       {
         "path": "outputs/04_validation_plan_and_governance.md",
         "sha256": "1059514d07b4b6f069e93c27c5902df8c6be0d3956f2605a4d1a0fbc0782ee54",
-        "recorded_at": "2026-11-11T15:58:37+03:00"
+        "recorded_at": "2026-11-14T21:00:37+03:00"
       }
     ]
   },
