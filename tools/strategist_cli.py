@@ -1547,6 +1547,13 @@ def export_html(case_dir, out_file=None):
     cost_totals = status.get("cost_totals", {})
     cost_usd = cost_totals.get("total_estimated_cost_usd", 0.0)
     dur_sec = cost_totals.get("total_duration_sec", 0.0)
+    tokens_total = cost_totals.get("total_tokens", 0)
+    ledger = (state.get("cost_and_usage_ledger") or {}).get("entries", [])
+    any_estimated = any(e.get("is_estimated") for e in ledger)
+    cost_note = ("оценка; 0,0000 означает «не измерено», а не «бесплатно»" if cost_usd == 0 and any_estimated
+                 else ("оценка" if any_estimated else "измерено"))
+    token_label = "оценка" if any_estimated else "измерено"
+    duration_label = "часть шагов — оценка" if any_estimated else "измерено"
     integrity_ok = "PASS (OK)" if status.get("artifacts_integrity_ok") else "MISMATCH"
 
     html_content = f"""<!DOCTYPE html>
@@ -1555,7 +1562,7 @@ def export_html(case_dir, out_file=None):
     <meta charset="UTF-8">
     <title>Интерактивный дашборд кейса {case_id} — Стратег Фабрики продуктов</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.min.js"></script>
     <style>
         body {{ font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #F8FAFC; color: #0F172A; margin: 0; padding: 24px; }}
         .header {{ background: linear-gradient(135deg, #00B956 0%, #008A40 100%); color: #fff; padding: 24px; border-radius: 12px; margin-bottom: 24px; }}
@@ -1590,8 +1597,9 @@ def export_html(case_dir, out_file=None):
             <p><b>Текущий этап:</b> <span class="badge-stat pass">{status.get('current_stage')}</span></p>
             <p><b>Валидация схем:</b> <span class="badge-stat pass">{status.get('validation_status')}</span></p>
             <p><b>Целостность артефактов:</b> <span class="badge-stat pass">{integrity_ok}</span></p>
-            <p><b>Себестоимость прогона:</b> <b>${cost_usd:.4f}</b> (~9.5 руб.)</p>
-            <p><b>Время работы LLM:</b> {dur_sec} сек.</p>
+            <p><b>Стоимость по журналу:</b> <b>${cost_usd:.4f}</b> ({cost_note})</p>
+            <p><b>Токены по журналу:</b> {tokens_total:,} ({token_label})</p>
+            <p><b>Время работы агента по журналу:</b> {dur_sec} сек. ({duration_label})</p>
         </div>
     </div>
 
@@ -1600,6 +1608,8 @@ def export_html(case_dir, out_file=None):
         <div class="mermaid">
 {mermaid_graph}
         </div>
+        <details style="margin-top:8px"><summary>Текстовая запись графа (если диаграмма не загрузилась без интернета)</summary>
+        <pre style="white-space:pre-wrap;font-size:12px">{py_html.escape(mermaid_graph)}</pre></details>
     </div>
 
     <div class="grid">
