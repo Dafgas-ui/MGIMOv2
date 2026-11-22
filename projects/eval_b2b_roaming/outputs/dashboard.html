@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <title>Интерактивный дашборд кейса eval_b2b_roaming — Стратег Фабрики продуктов</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.min.js"></script>
     <style>
         body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #F8FAFC; color: #0F172A; margin: 0; padding: 24px; }
         .header { background: linear-gradient(135deg, #00B956 0%, #008A40 100%); color: #fff; padding: 24px; border-radius: 12px; margin-bottom: 24px; }
@@ -39,8 +39,9 @@
             <p><b>Текущий этап:</b> <span class="badge-stat pass">HUMAN_DECISION</span></p>
             <p><b>Валидация схем:</b> <span class="badge-stat pass">PASS</span></p>
             <p><b>Целостность артефактов:</b> <span class="badge-stat pass">PASS (OK)</span></p>
-            <p><b>Себестоимость прогона:</b> <b>$0.0000</b> (~9.5 руб.)</p>
-            <p><b>Время работы LLM:</b> 0.0 сек.</p>
+            <p><b>Стоимость по журналу:</b> <b>$0.0000</b> (измерено)</p>
+            <p><b>Токены по журналу:</b> 0 (измерено)</p>
+            <p><b>Время работы агента по журналу:</b> 0.0 сек. (измерено)</p>
         </div>
     </div>
 
@@ -71,6 +72,30 @@ flowchart LR
   C_002 --> O_003
   classDef rec fill:#00B956,stroke:#008A40,stroke-width:2px,color:#fff;
         </div>
+        <details style="margin-top:8px"><summary>Текстовая запись графа (если диаграмма не загрузилась без интернета)</summary>
+        <pre style="white-space:pre-wrap;font-size:12px">flowchart LR
+  S_001[&quot;📄 S-001: Выгрузка статистики бизне...&quot;]
+  S_002[&quot;📄 S-002: Бенчмарк тарифов междунар...&quot;]
+  S_003[&quot;📄 S-003: Глубинные интервью с фина...&quot;]
+  F_001[&quot;🔍 F-001: В Китае (71.2%), Турции (...&quot;]
+  S_001 --&gt; F_001
+  F_002[&quot;🔍 F-002: Туристические eSIM не пре...&quot;]
+  S_002 --&gt; F_002
+  F_003[&quot;🔍 F-003: Главный барьер подключени...&quot;]
+  S_003 --&gt; F_003
+  C_001(&quot;📊 C-001:  GB&quot;)
+  C_002(&quot;📊 C-002:  %&quot;)
+  O_001[&quot;🎯 O-001: Статус-кво: сохранение те&quot;]
+  F_001 --&gt; O_001
+  O_002[&quot;🎯 O-002: Закрытие направления и вы&quot;]
+  F_001 --&gt; O_002
+  O_003[&quot;🎯 O-003: Запуск продукта «Корпорат&quot;]
+  F_001 --&gt; O_003
+  F_002 --&gt; O_003
+  F_003 --&gt; O_003
+  C_001 --&gt; O_003
+  C_002 --&gt; O_003
+  classDef rec fill:#00B956,stroke:#008A40,stroke-width:2px,color:#fff;</pre></details>
     </div>
 
     <div class="grid">

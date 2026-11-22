@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <title>Интерактивный дашборд кейса demo_mvp — Стратег Фабрики продуктов</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.min.js"></script>
     <style>
         body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #F8FAFC; color: #0F172A; margin: 0; padding: 24px; }
         .header { background: linear-gradient(135deg, #00B956 0%, #008A40 100%); color: #fff; padding: 24px; border-radius: 12px; margin-bottom: 24px; }
@@ -39,8 +39,9 @@
             <p><b>Текущий этап:</b> <span class="badge-stat pass">DECISION_MONITORING</span></p>
             <p><b>Валидация схем:</b> <span class="badge-stat pass">PASS</span></p>
             <p><b>Целостность артефактов:</b> <span class="badge-stat pass">PASS (OK)</span></p>
-            <p><b>Себестоимость прогона:</b> <b>$0.0990</b> (~9.5 руб.)</p>
-            <p><b>Время работы LLM:</b> 742.0 сек.</p>
+            <p><b>Стоимость по журналу:</b> <b>$0.0990</b> (оценка)</p>
+            <p><b>Токены по журналу:</b> 47,000 (оценка)</p>
+            <p><b>Время работы агента по журналу:</b> 742.0 сек. (часть шагов — оценка)</p>
         </div>
     </div>
 
@@ -89,6 +90,48 @@ flowchart LR
   F_007 --> O_004
   classDef rec fill:#00B956,stroke:#008A40,stroke-width:2px,color:#fff;
         </div>
+        <details style="margin-top:8px"><summary>Текстовая запись графа (если диаграмма не загрузилась без интернета)</summary>
+        <pre style="white-space:pre-wrap;font-size:12px">flowchart LR
+  S_001[&quot;📄 S-001: Финансовый отчет биллинга...&quot;]
+  S_002[&quot;📄 S-002: Продуктовая аналитика три...&quot;]
+  S_003[&quot;📄 S-003: Аналитический обзор рынка...&quot;]
+  S_004[&quot;📄 S-004: UX-аудит экранов онбордин...&quot;]
+  S_005[&quot;📄 S-005: Векторная схема и UX-ауди...&quot;]
+  F_001[&quot;🔍 F-001: Конверсия посетителей лен...&quot;]
+  S_001 --&gt; F_001
+  F_002[&quot;🔍 F-002: Конверсия активированных ...&quot;]
+  S_002 --&gt; F_002
+  F_003[&quot;🔍 F-003: Себестоимость GPU-инферен...&quot;]
+  S_003 --&gt; F_003
+  F_004[&quot;🔍 F-004: 77.2% пользователей покид...&quot;]
+  S_004 --&gt; F_004
+  F_005[&quot;🔍 F-005: M2 Retention у пользовате...&quot;]
+  S_004 --&gt; F_005
+  F_006[&quot;🔍 F-006: Средняя стоимость привлеч...&quot;]
+  S_001 --&gt; F_006
+  F_007[&quot;🔍 F-007: Композиция экрана 2 онбор...&quot;]
+  S_005 --&gt; F_007
+  C_001(&quot;📊 C-001:  %&quot;)
+  C_002(&quot;📊 C-002:  months&quot;)
+  C_003(&quot;📊 C-003:  ratio_multiplier&quot;)
+  O_001[&quot;🎯 O-001: Статус-кво: сохранение те&quot;]
+  F_001 --&gt; O_001
+  F_006 --&gt; O_001
+  F_007 --&gt; O_001
+  O_002[&quot;🎯 O-002: Закрытие отдельной B2C-по&quot;]
+  F_001 --&gt; O_002
+  F_006 --&gt; O_002
+  F_007 --&gt; O_002
+  O_003[&quot;🎯 O-003: Инвестиции в R&amp;D потоково&quot;]
+  F_003 --&gt; O_003
+  C_001 --&gt; O_003
+  O_004[&quot;🎯 O-004: Фокус на бесшовном семейн&quot;]
+  F_004 --&gt; O_004
+  F_005 --&gt; O_004
+  C_002 --&gt; O_004
+  C_003 --&gt; O_004
+  F_007 --&gt; O_004
+  classDef rec fill:#00B956,stroke:#008A40,stroke-width:2px,color:#fff;</pre></details>
     </div>
 
     <div class="grid">

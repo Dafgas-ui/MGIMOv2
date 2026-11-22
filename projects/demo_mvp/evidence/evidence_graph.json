@@ -1,7 +1,7 @@
 {
   "case_id": "demo_mvp",
   "schema_version": "1.0",
-  "updated_at": "2026-11-09T16:00:00+03:00",
+  "updated_at": "2026-11-22T14:48:10+03:00",
   "research_questions": [
     {
       "id": "Q-001",
@@ -48,7 +48,9 @@
       "content_hash": "sha256:39a51bc596d7ef7eac88565faa67d61d4ef99283835eac62b74491fa2b935587",
       "version": "1.0",
       "retrieved_at": "2026-11-09T10:00:00+03:00",
-      "notes": "Выгрузка биллинга; зафиксированы пропуски в cac_rub и m2_retention_pct по 2 регионам (T04)"
+      "notes": "Выгрузка биллинга; зафиксированы пропуски в cac_rub и m2_retention_pct по 2 регионам (T04) Учебные синтетические данные, не выгрузка реального биллинга.",
+      "is_synthetic": true,
+      "origin": "synthetic_benchmark"
     },
     {
       "id": "S-002",
@@ -60,7 +62,9 @@
       "content_hash": "sha256:c853341096c953e07b96a47d30ed2618a1c4f8317bcbc2952067c8828ace8201",
       "version": "1.0",
       "retrieved_at": "2026-11-09T10:15:00+03:00",
-      "notes": "Выгрузка продуктовых событий триалов; числитель оплат совпадает с S-001 (8026)"
+      "notes": "Выгрузка продуктовых событий триалов; числитель оплат совпадает с S-001 (8026) Учебные синтетические данные, не выгрузка реальной аналитики.",
+      "is_synthetic": true,
+      "origin": "synthetic_benchmark"
     },
     {
       "id": "S-003",
@@ -72,7 +76,9 @@
       "content_hash": "sha256:499f9e5a2ad99c71b7fa1f943156908e82ce2ea28d47fbf26bcc3b1ad2cb02b8",
       "version": "2026-Q3",
       "retrieved_at": "2026-11-09T10:30:00+03:00",
-      "notes": "В тексте источника выявлена и нейтрализована попытка Prompt Injection [SYSTEM INSTRUCTION OVERRIDE]; анализ выполнен в режиме untrusted_data без изменения системных правил (T10)"
+      "notes": "В тексте источника выявлена и нейтрализована попытка Prompt Injection [SYSTEM INSTRUCTION OVERRIDE]; анализ выполнен в режиме untrusted_data без изменения системных правил (T10) Учебный обзор: сведения о конкурентах и ценах не сверены с открытыми источниками и не являются рыночным фактом.",
+      "is_synthetic": true,
+      "origin": "synthetic_benchmark"
     },
     {
       "id": "S-004",
@@ -98,9 +104,9 @@
       "content_hash": "sha256:d11eed388a2811505de761bbf57c3ee9b23856cefbb2deacc8ba20a85b64fc57",
       "version": "2.4.0",
       "retrieved_at": "2026-11-14T20:44:00+03:00",
-      "is_synthetic": false,
-      "origin": "empirical",
-      "notes": "Схема экранов онбординга (viewBox 0 0 1200 800): экран 1 (промо), экран 2 (SMS-барьер #friction-sms-modal), экран 3 (категории)"
+      "is_synthetic": true,
+      "origin": "synthetic_benchmark",
+      "notes": "Схема экранов онбординга (viewBox 0 0 1200 800): экран 1 (промо), экран 2 (SMS-барьер #friction-sms-modal), экран 3 (категории) Схема экранов нарисована командой (SVG-макет), не снимок реального приложения; F-007 относится к этому макету."
     }
   ],
   "findings": [

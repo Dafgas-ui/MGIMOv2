@@ -2,7 +2,7 @@
   "case_id": "eval_b2b_roaming",
   "schema_version": "1.0",
   "created_at": "2026-11-12T22:23:09+03:00",
-  "updated_at": "2026-11-12T22:38:02+03:00",
+  "updated_at": "2026-11-22T14:48:10+03:00",
   "problem_framing": {
     "raw_request": "Подумай над продуктовой стратегией корпоративного роуминга для малого бизнеса: сейчас компании переходят на локальные eSIM других стран или мессенджеры, выручка направления падает на 18% в год.",
     "clarified_problem": "Отток корпоративных клиентов МСБ в зарубежные туристические eSIM из-за непредсказуемости тарификации и отсутствия закрывающих документов для бухгалтерии",
@@ -96,33 +96,33 @@
     "artifacts_integrity": [
       {
         "path": "evidence/evidence_graph.json",
-        "sha256": "0eafe25e0d9fe8834d137fe514180a6d792d75207e668b157389a9885a91af76",
-        "recorded_at": "2026-11-12T22:38:02+03:00"
+        "sha256": "f11b5158837bbae358ebe7fbf9d8ca9a6f614e5b621bf4de54d032c542cf07a6",
+        "recorded_at": "2026-11-22T14:48:10+03:00"
       },
       {
         "path": "decisions/strategy_decision.json",
         "sha256": "0ce1892023ace9587e69d3f50d393e7eee3378461feac9e8903ba292ced645d0",
-        "recorded_at": "2026-11-12T22:38:02+03:00"
+        "recorded_at": "2026-11-22T14:48:10+03:00"
       },
       {
         "path": "outputs/01_research_and_evidence.md",
-        "sha256": "8a7c0778b31db87b4ac08494cb4df8cd45a745249c2eb0fe6fa1529cda5445ee",
-        "recorded_at": "2026-11-12T22:38:02+03:00"
+        "sha256": "bb6f0d5ddd0690862d6bfa1bf7645a64d2e77973f5c4797ccf904335c773502d",
+        "recorded_at": "2026-11-22T14:48:10+03:00"
       },
       {
         "path": "outputs/02_alternatives_comparison.md",
-        "sha256": "2d41d511cd644b726af48da936f83121d548705f3252a5a49f5104552cb99056",
-        "recorded_at": "2026-11-12T22:38:02+03:00"
+        "sha256": "15e4a1acd87ee696addc5c8680c6ef50b522bb97362f5f683eedb5602186b452",
+        "recorded_at": "2026-11-22T14:48:10+03:00"
       },
       {
         "path": "outputs/03_product_and_comm_strategy.md",
-        "sha256": "f250698232ef27b5f53c529e0ff2c01f3191e6d1670dafcf295d051b4788a036",
-        "recorded_at": "2026-11-12T22:38:02+03:00"
+        "sha256": "4da2b1a5078f3db48580f4d567a810de48cbd5fb1296326d5b51708f30cb2238",
+        "recorded_at": "2026-11-22T14:48:10+03:00"
       },
       {
         "path": "outputs/04_validation_plan_and_governance.md",
-        "sha256": "2469a18c8196806e25050033699dca5caeacad016c4152603ce68ab5dcbb9f21",
-        "recorded_at": "2026-11-12T22:38:02+03:00"
+        "sha256": "a9cc5dafe1ea2b82d7606981b92c58af6faf85c1d40272d5cdf20c199f1e57f5",
+        "recorded_at": "2026-11-22T14:48:10+03:00"
       }
     ]
   },
