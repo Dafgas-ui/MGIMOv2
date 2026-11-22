@@ -1,0 +1,6 @@
+metric_id,metric_name,unit,base_year_plan,base_year_estimate,plan_year_no_change,plan_year_goal_min
+K1,gross_profit_year,mln_rub,282,275,279,285
+K2,active_family_groups_last_month,groups,5000,4000,5000,8000
+K3,connected_family_groups_year_end,groups,7500,6500,8000,12000
+K4,connected_multi_number_owners_year_end,owners,1000,800,1000,2000
+K5,groups_activated_within_14d_share_last_quarter,percent,50,42,45,60

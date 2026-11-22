@@ -1,0 +1,235 @@
+{
+  "case_id": "connect_family_devices",
+  "schema_version": "1.0",
+  "created_at": "2026-11-22T14:43:49+03:00",
+  "updated_at": "2026-11-22T14:50:12+03:00",
+  "problem_framing": {
+    "raw_request": "Бриф «Связь для близких и собственных устройств» (вымышленный оператор): выбрать первых клиентов и проблему, предложить услугу, спланировать год и задать ориентир на 3-й год; решения руководителя — к концу 1-го и 2-го кварталов.",
+    "clarified_problem": "Выбрать первую группу клиентов и проблему, предложить услугу, показать пользу и прибыль, составить план на год и ориентир на 3-й год; решения руководителя — конец 1-го и 2-го кварталов.",
+    "goal": "К концу 1-го квартала решить, выделять ли людей и деньги на пилот; к концу 2-го — расширять охват, менять предложение или продолжать наблюдение",
+    "decision_recipient": "Руководитель направления и финансовая команда оператора",
+    "constraints": [
+      "Все числа учебные; используются только данные брифа и явные допущения",
+      "Согласие участника на показ сведений о его номере; платёж подтверждает плательщик",
+      "Разработка: предварительно 3 человеко-месяца на 2-й квартал; дизайнер и аналитик по 0,5 ставки не выделены; 1 человеко-месяц тестирования не подтверждён"
+    ],
+    "available_data_summary": "Учебный бриф организаторов (текст), таблица исходных показателей, константы рынка и ресурсов; частоты причин перебоев и истории клиентов в брифе не даны.",
+    "pending_clarifying_questions": []
+  },
+  "workflow": {
+    "current_stage": "HUMAN_DECISION",
+    "completed_stages": [
+      "INTAKE",
+      "RESEARCH_PLANNING",
+      "EVIDENCE_COLLECTION",
+      "EVIDENCE_VALIDATION",
+      "OPTIONS_GENERATION",
+      "STRATEGY_DESIGN",
+      "INDEPENDENT_REVIEW"
+    ],
+    "stage_history": [
+      {
+        "from_stage": null,
+        "to_stage": "INTAKE",
+        "timestamp": "2026-11-22T14:43:49+03:00",
+        "transition_type": "start",
+        "reason": "Инициализация кейса"
+      },
+      {
+        "from_stage": "INTAKE",
+        "to_stage": "RESEARCH_PLANNING",
+        "timestamp": "2026-11-22T14:43:49+03:00",
+        "transition_type": "forward",
+        "reason": "Рамка зафиксирована: цель, получатель, ограничения, данные"
+      },
+      {
+        "from_stage": "RESEARCH_PLANNING",
+        "to_stage": "EVIDENCE_COLLECTION",
+        "timestamp": "2026-11-22T14:43:50+03:00",
+        "transition_type": "forward",
+        "reason": "Вопросы Q-001…Q-007 определены; сбор источников"
+      },
+      {
+        "from_stage": "EVIDENCE_COLLECTION",
+        "to_stage": "EVIDENCE_VALIDATION",
+        "timestamp": "2026-11-22T14:43:54+03:00",
+        "transition_type": "forward",
+        "reason": "Факты и расчёты собраны; проверка методологии и пробелов"
+      },
+      {
+        "from_stage": "EVIDENCE_VALIDATION",
+        "to_stage": "OPTIONS_GENERATION",
+        "timestamp": "2026-11-22T14:43:56+03:00",
+        "transition_type": "forward",
+        "reason": "Граф проверен; формирование вариантов"
+      },
+      {
+        "from_stage": "OPTIONS_GENERATION",
+        "to_stage": "STRATEGY_DESIGN",
+        "timestamp": "2026-11-22T14:43:56+03:00",
+        "transition_type": "forward",
+        "reason": "Варианты сформированы, выбран O-003 для пилота"
+      },
+      {
+        "from_stage": "STRATEGY_DESIGN",
+        "to_stage": "INDEPENDENT_REVIEW",
+        "timestamp": "2026-11-22T14:44:26+03:00",
+        "transition_type": "forward",
+        "reason": "Передано на проверку: строгий валидатор и контрольный список аудитора (отдельный прогон модели-аудитора не выполнялся)"
+      },
+      {
+        "from_stage": "INDEPENDENT_REVIEW",
+        "to_stage": "HUMAN_DECISION",
+        "timestamp": "2026-11-22T14:44:26+03:00",
+        "transition_type": "forward",
+        "reason": "Переход INDEPENDENT_REVIEW -> HUMAN_DECISION"
+      }
+    ],
+    "awaiting_human_approval": {
+      "is_awaiting": true,
+      "reason": "Требуется решение человека: утвердить пилот O-003, изменить условия или сначала устранить препятствия (G-001, G-002, G-005, G-006)"
+    }
+  },
+  "checkpoints_and_recovery": {
+    "last_completed_operation_id": "step-008-five-part-document",
+    "in_progress_operation": null,
+    "artifacts_integrity": [
+      {
+        "path": "evidence/evidence_graph.json",
+        "sha256": "d92913e811b7353aea2ce5454c82b47c560038caf14b4ec1a68993f8a87e3c66",
+        "recorded_at": "2026-11-22T14:44:26+03:00"
+      },
+      {
+        "path": "decisions/strategy_decision.json",
+        "sha256": "2593eb72d4e50b95fe9e34679bf8716051e48ae29c3bd2a1ab7849748b8825f1",
+        "recorded_at": "2026-11-22T14:44:26+03:00"
+      },
+      {
+        "path": "outputs/01_research_and_evidence.md",
+        "sha256": "24b0f3096f7a5057872e4df152c6dba85c06a3d044145799d53b37839377988e",
+        "recorded_at": "2026-11-22T14:44:26+03:00"
+      },
+      {
+        "path": "outputs/02_alternatives_comparison.md",
+        "sha256": "acae06d194f05d461bc60b370e3f55213b31ee893d9975f0f4c6c9877ad54b2c",
+        "recorded_at": "2026-11-22T14:44:26+03:00"
+      },
+      {
+        "path": "outputs/03_product_and_comm_strategy.md",
+        "sha256": "fb64add932f0dfaca5dcfaea6dd6ca892e3eeac8b6f2aee12259ba2664071858",
+        "recorded_at": "2026-11-22T14:44:26+03:00"
+      },
+      {
+        "path": "outputs/04_validation_plan_and_governance.md",
+        "sha256": "aa335a40a054a35106b9e035f1c530d41fb9baf25a5d298dbf9adc5dc35c2dc9",
+        "recorded_at": "2026-11-22T14:44:26+03:00"
+      }
+    ]
+  },
+  "cost_and_usage_ledger": {
+    "entries": [
+      {
+        "step_id": "step-001-intake",
+        "timestamp": "2026-11-22T14:43:49+03:00",
+        "actor_or_tool": "problem-framing",
+        "model_tier": "heavy",
+        "duration_sec": 240.0,
+        "tokens_in": 9000,
+        "tokens_out": 1500,
+        "estimated_cost_usd": 0.0,
+        "is_estimated": true,
+        "notes": "Разбор официального брифа и фиксация рамки задачи; токены оценены. Длительность оценена по меткам времени файлов сеанса (время работы агента над содержанием), а не по запуску скриптов (0.1 с)."
+      },
+      {
+        "step_id": "step-002-research-plan",
+        "timestamp": "2026-11-22T14:43:50+03:00",
+        "actor_or_tool": "problem-framing",
+        "model_tier": "heavy",
+        "duration_sec": 60.0,
+        "tokens_in": 4000,
+        "tokens_out": 1200,
+        "estimated_cost_usd": 0.0,
+        "is_estimated": true,
+        "notes": "План исследования: 7 вопросов, способных изменить решение. Длительность оценена по меткам времени файлов сеанса (время работы агента над содержанием), а не по запуску скриптов (0.7 с)."
+      },
+      {
+        "step_id": "step-003-sources-findings",
+        "timestamp": "2026-11-22T14:43:51+03:00",
+        "actor_or_tool": "research-analyst",
+        "model_tier": "light",
+        "duration_sec": 150.0,
+        "tokens_in": 14000,
+        "tokens_out": 3500,
+        "estimated_cost_usd": 0.0,
+        "is_estimated": true,
+        "notes": "Разбор брифа и таблиц: 3 источника, 11 фактов с локаторами; токены оценены. Длительность оценена по меткам времени файлов сеанса (время работы агента над содержанием), а не по запуску скриптов (1.4 с)."
+      },
+      {
+        "step_id": "step-004-calculations",
+        "timestamp": "2026-11-22T14:43:54+03:00",
+        "actor_or_tool": "tools/strategist_cli.py",
+        "model_tier": "none",
+        "duration_sec": 2.3,
+        "tokens_in": 0,
+        "tokens_out": 0,
+        "estimated_cost_usd": 0.0,
+        "is_estimated": false,
+        "notes": "24 воспроизводимых расчёта: каждая reproduce_command выполнена, результат записан из вывода"
+      },
+      {
+        "step_id": "step-005-validation",
+        "timestamp": "2026-11-22T14:43:56+03:00",
+        "actor_or_tool": "source-and-data-analysis",
+        "model_tier": "heavy",
+        "duration_sec": 180.0,
+        "tokens_in": 16000,
+        "tokens_out": 4500,
+        "estimated_cost_usd": 0.0,
+        "is_estimated": true,
+        "notes": "8 пробелов, 2 методологических расхождения, 7 гипотез; ответы на вопросы привязаны к узлам; токены оценены. Длительность оценена по меткам времени файлов сеанса (время работы агента над содержанием), а не по запуску скриптов (2.0 с)."
+      },
+      {
+        "step_id": "step-006-options-strategy",
+        "timestamp": "2026-11-22T14:43:56+03:00",
+        "actor_or_tool": "options-and-strategy",
+        "model_tier": "heavy",
+        "duration_sec": 240.0,
+        "tokens_in": 22000,
+        "tokens_out": 9000,
+        "estimated_cost_usd": 0.0,
+        "is_estimated": true,
+        "notes": "Пять вариантов, продуктовая и коммуникационная стратегии, план проверки, обязательства; токены оценены. Длительность оценена по меткам времени файлов сеанса (время работы агента над содержанием), а не по запуску скриптов (0.3 с)."
+      },
+      {
+        "step_id": "step-007-review",
+        "timestamp": "2026-11-22T14:50:12+03:00",
+        "actor_or_tool": "tools/schema_validator.py",
+        "model_tier": "none",
+        "duration_sec": 3.0,
+        "tokens_in": 0,
+        "tokens_out": 0,
+        "estimated_cost_usd": 0.0,
+        "is_estimated": false,
+        "notes": "Строгая валидация кейса и render-outputs (измерено); отдельный прогон модели-аудитора не выполнялся"
+      },
+      {
+        "step_id": "step-008-five-part-document",
+        "timestamp": "2026-11-22T14:50:12+03:00",
+        "actor_or_tool": "options-and-strategy",
+        "model_tier": "heavy",
+        "duration_sec": 200.0,
+        "tokens_in": 30000,
+        "tokens_out": 9000,
+        "estimated_cost_usd": 0.0,
+        "is_estimated": true,
+        "notes": "Сводный документ из пяти частей по структуре брифа; токены и длительность оценены по меткам времени сеанса"
+      }
+    ],
+    "totals": {
+      "total_duration_sec": 1075.3,
+      "total_tokens": 123700,
+      "total_estimated_cost_usd": 0.0
+    }
+  },
+  "case_type": "educational_demo"
+}

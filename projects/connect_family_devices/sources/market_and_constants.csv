@@ -1,0 +1,13 @@
+parameter,value,unit,note
+households_total_market,300000,households,"Учебный рынок: домохозяйства, которым нужна помощь со связью"
+owners_multi_number_total_market,180000,owners,"Владельцы нескольких собственных номеров"
+households_accessible_to_operator,100000,households,"Доступно оператору с учётом тарифов и способов привлечения"
+owners_accessible_to_operator,40000,owners,"Владелец, подходящий под оба описания, учтён только в составе домохозяйства"
+gross_profit_per_extra_paid_month,500,rub,"Общая учебная ставка: валовая прибыль за один дополнительный оплаченный месяц одного номера"
+dev_capacity_q2_preliminary,3,person_months,"Разработчики: предварительно выделено на 2-й квартал"
+designer_fte_unallocated,0.5,fte,"Дизайнер: половина ставки предстоит выделить"
+analyst_fte_unallocated,0.5,fte,"Аналитик: половина ставки предстоит выделить"
+qa_capacity_unconfirmed,1,person_months,"Специалист по проверке услуги: 1 человеко-месяц пока не подтверждён"
+example_restriction_share_before,12,percent,"Пример из брифа: доля ограничений до изменения (учебный пример, не измерение)"
+example_restriction_share_after,9,percent,"Пример из брифа: доля после изменения"
+example_pilot_groups_required,600,groups,"Пример из брифа: если для проверки нужны 600 групп и 6 недель набора, то ~100 новых подходящих групп в неделю"
