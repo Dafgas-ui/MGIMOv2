@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Интерактивный дашборд кейса eval_b2b_roaming — Стратег Фабрики продуктов</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #F8FAFC; color: #0F172A; margin: 0; padding: 24px; }
+        .header { background: linear-gradient(135deg, #00B956 0%, #008A40 100%); color: #fff; padding: 24px; border-radius: 12px; margin-bottom: 24px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 16px; margin-bottom: 24px; }
+        .box { background: #fff; padding: 20px; border-radius: 10px; border: 1px solid #E2E8F0; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .badge-stat { display: inline-block; padding: 4px 10px; border-radius: 6px; font-weight: 700; font-size: 12px; }
+        .pass { background: #DCFCE7; color: #166534; }
+        .warn { background: #FEF9C3; color: #854D0E; }
+        h2 { font-size: 18px; margin-top: 0; color: #1E293B; border-bottom: 2px solid #F1F5F9; padding-bottom: 8px; }
+        table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 8px; }
+        th, td { padding: 8px; text-align: left; border-bottom: 1px solid #E2E8F0; }
+        th { background: #F8FAFC; color: #475569; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1 style="margin:0 0 8px 0; font-size:24px;">Стратег Фабрики продуктов — eval_b2b_roaming</h1>
+        <p style="margin:0; opacity:0.9; font-size:14px;">Интерактивная витрина доказательств и продуктовой стратегии (MGIMO AI Challenge 2026)</p>
+    </div>
+
+    <div class="grid">
+        <div class="box">
+            <h2>1. Рамка задачи (INTAKE)</h2>
+            <p><b>Проблема:</b> Отток корпоративных клиентов МСБ в зарубежные туристические eSIM из-за непредсказуемости тарификации и отсутствия закрывающих документов для бухгалтерии</p>
+            <p><b>Цель:</b> Остановить падение выручки роуминга МСБ (-18% YoY) за счёт запуска пула трафика с централизованной корпоративной оплатой для командировок в СНГ, ОАЭ, Турцию и Китай</p>
+            <p><b>Получатель:</b> Руководитель департамента корпоративных продуктов МегаФона (B2B)</p>
+            <p><b>Ограничения:</b> Техническая совместимость с существующим B2B-биллингом МегаФона; Запрет на демпинг ниже межоператорской себестоимости передачи данных; Ограничение на бюджет пилотного запуска: до 2.5 млн руб.</p>
+        </div>
+
+        <div class="box">
+            <h2>2. Аудит и статус кейса (T07, T11)</h2>
+            <p><b>Текущий этап:</b> <span class="badge-stat pass">HUMAN_DECISION</span></p>
+            <p><b>Валидация схем:</b> <span class="badge-stat pass">PASS</span></p>
+            <p><b>Целостность артефактов:</b> <span class="badge-stat pass">PASS (OK)</span></p>
+            <p><b>Себестоимость прогона:</b> <b>$0.0000</b> (~9.5 руб.)</p>
+            <p><b>Время работы LLM:</b> 0.0 сек.</p>
+        </div>
+    </div>
+
+    <div class="box" style="margin-bottom: 24px;">
+        <h2>3. Граф доказательств (Mermaid Evidence Graph)</h2>
+        <div class="mermaid">
+flowchart LR
+  S_001["📄 S-001: Выгрузка статистики бизне..."]
+  S_002["📄 S-002: Бенчмарк тарифов междунар..."]
+  S_003["📄 S-003: Глубинные интервью с фина..."]
+  F_001["🔍 F-001: В Китае (71.2%), Турции (..."]
+  S_001 --> F_001
+  F_002["🔍 F-002: Туристические eSIM не пре..."]
+  S_002 --> F_002
+  F_003["🔍 F-003: Главный барьер подключени..."]
+  S_003 --> F_003
+  C_001("📊 C-001:  GB")
+  C_002("📊 C-002:  %")
+  O_001["🎯 O-001: Статус-кво: сохранение те"]
+  F_001 --> O_001
+  O_002["🎯 O-002: Закрытие направления и вы"]
+  F_001 --> O_002
+  O_003["🎯 O-003: Запуск продукта «Корпорат"]
+  F_001 --> O_003
+  F_002 --> O_003
+  F_003 --> O_003
+  C_001 --> O_003
+  C_002 --> O_003
+  classDef rec fill:#00B956,stroke:#008A40,stroke-width:2px,color:#fff;
+        </div>
+    </div>
+
+    <div class="grid">
+        <div class="box">
+            <h2>4. Сравнение альтернатив</h2>
+            
+        <div style="border: 1px solid #E2E8F0; border-radius: 8px; padding: 16px; margin-bottom: 12px; background: #fff;">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <h4 style="margin:0;">O-001: Статус-кво: сохранение текущей розничной тарификации мегабайт и пакетов на номер</h4>
+                
+            </div>
+            <p style="font-size:13px; color:#475569; margin:8px 0;">Продолжение работы без изменений продуктовой линейки роуминга</p>
+            <div style="font-size:12px; color:#64748B;">
+                <b>Сильные возражения:</b> Ускорение оттока компаний в альтернативные eSIM (уже 58-71% в ключевых странах по F-001); Падение годовой выручки направления на 18% YoY продолжится
+            </div>
+        </div>
+        
+        <div style="border: 1px solid #E2E8F0; border-radius: 8px; padding: 16px; margin-bottom: 12px; background: #fff;">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <h4 style="margin:0;">O-002: Закрытие направления и вывод B2B-роуминга из активных продаж</h4>
+                
+            </div>
+            <p style="font-size:13px; color:#475569; margin:8px 0;">Отказ от продвижения роуминга в B2B, сохранение только аварийного базового доступа</p>
+            <div style="font-size:12px; color:#64748B;">
+                <b>Сильные возражения:</b> Потеря маржинального сегмента корпоративных клиентов с высоким совокупным ARPU; Ухудшение конкурентной позиции МегаФона в тендерах на комплексное обслуживание компаний
+            </div>
+        </div>
+        
+        <div style="border: 1px solid #E2E8F0; border-radius: 8px; padding: 16px; margin-bottom: 12px; background: #fff;">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <h4 style="margin:0;">O-003: Запуск продукта «Корпоративный Пул Роуминга»: общий котёл гигабайтов на компанию с закрывающими актами РФ</h4>
+                
+            </div>
+            <p style="font-size:13px; color:#475569; margin:8px 0;">Единый пакет трафика (от 50 ГБ) на лицевой счёт юрлица с возможностью гибкого распределения между сотрудниками, автоматическим стоп-лимитом и 100% закрытием бухгалтерии (УПД/НДС)</p>
+            <div style="font-size:12px; color:#64748B;">
+                <b>Сильные возражения:</b> Требуется доработка B2B-биллинга для агрегации списаний нескольких номеров из одного пула (срок доработки 4 недели); Риск превышения оптового выкупа трафика в странах с жесткими межоператорскими ставками (требуются стоп-лимиты)
+            </div>
+        </div>
+        
+        </div>
+
+        <div class="box">
+            <h2>5. Рекомендованное решение (—)</h2>
+            <p><b>Продуктовое позиционирование:</b> —</p>
+            <p><b>Ключевое сообщение:</b> <i>«МегаФон Корпоративный Пул Роуминга: забудьте об авансовых отчетах по eSIM и чекам из аэропортов. Один предсказуемый пакет гигабайтов на всю компанию, прозрачный лимит и полный комплект закрывающих документов с НДС для вашей бухгалтерии»</i></p>
+            <p><b>План проверки (90 дней):</b> Замедление темпов падения выручки B2B-роуминга с -18% до -5% YoY за счет возврата командировок из eSIM в корпоративный пул</p>
+            <h3>Обязательства (Commitments):</h3>
+            <table>
+                <tr><th>ID</th><th>Владелец</th><th>Действие</th><th>Срок</th></tr>
+                <tr><td>K-001</td><td>CPO B2B Roaming</td><td>Провести A/B пилот продукта «Корпоративный Пул Роуминга» на 50 компаниях МСБ</td><td>2026-12-15</td></tr>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        mermaid.initialize({ startOnLoad: true, theme: 'neutral' });
+    </script>
+</body>
+</html>

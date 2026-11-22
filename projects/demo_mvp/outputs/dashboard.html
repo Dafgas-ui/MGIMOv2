@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Интерактивный дашборд кейса demo_mvp — Стратег Фабрики продуктов</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #F8FAFC; color: #0F172A; margin: 0; padding: 24px; }
+        .header { background: linear-gradient(135deg, #00B956 0%, #008A40 100%); color: #fff; padding: 24px; border-radius: 12px; margin-bottom: 24px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 16px; margin-bottom: 24px; }
+        .box { background: #fff; padding: 20px; border-radius: 10px; border: 1px solid #E2E8F0; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .badge-stat { display: inline-block; padding: 4px 10px; border-radius: 6px; font-weight: 700; font-size: 12px; }
+        .pass { background: #DCFCE7; color: #166534; }
+        .warn { background: #FEF9C3; color: #854D0E; }
+        h2 { font-size: 18px; margin-top: 0; color: #1E293B; border-bottom: 2px solid #F1F5F9; padding-bottom: 8px; }
+        table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 8px; }
+        th, td { padding: 8px; text-align: left; border-bottom: 1px solid #E2E8F0; }
+        th { background: #F8FAFC; color: #475569; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1 style="margin:0 0 8px 0; font-size:24px;">Стратег Фабрики продуктов — demo_mvp</h1>
+        <p style="margin:0; opacity:0.9; font-size:14px;">Интерактивная витрина доказательств и продуктовой стратегии (MGIMO AI Challenge 2026)</p>
+    </div>
+
+    <div class="grid">
+        <div class="box">
+            <h2>1. Рамка задачи (INTAKE)</h2>
+            <p><b>Проблема:</b> Падение удержания M2 и методологическое расхождение воронки конверсии при выборе между дорогой ИИ-функциональностью и оптимизацией семейного онбординга</p>
+            <p><b>Цель:</b> Разработать доказательную продуктовую и коммуникационную стратегию B2C-подписки с обоснованным выбором варианта, юнит-экономикой и планом проверки</p>
+            <p><b>Получатель:</b> Руководитель Фабрики Продуктов МегаФона и совет директоров</p>
+            <p><b>Ограничения:</b> Без передачи персональных данных абонентов; Ограничение R&amp;D бюджета на GPU-инфраструктуру; Сохранение положительной юнит-экономики при ARPU 199 руб.</p>
+        </div>
+
+        <div class="box">
+            <h2>2. Аудит и статус кейса (T07, T11)</h2>
+            <p><b>Текущий этап:</b> <span class="badge-stat pass">DECISION_MONITORING</span></p>
+            <p><b>Валидация схем:</b> <span class="badge-stat pass">PASS</span></p>
+            <p><b>Целостность артефактов:</b> <span class="badge-stat pass">PASS (OK)</span></p>
+            <p><b>Себестоимость прогона:</b> <b>$0.0990</b> (~9.5 руб.)</p>
+            <p><b>Время работы LLM:</b> 742.0 сек.</p>
+        </div>
+    </div>
+
+    <div class="box" style="margin-bottom: 24px;">
+        <h2>3. Граф доказательств (Mermaid Evidence Graph)</h2>
+        <div class="mermaid">
+flowchart LR
+  S_001["📄 S-001: Финансовый отчет биллинга..."]
+  S_002["📄 S-002: Продуктовая аналитика три..."]
+  S_003["📄 S-003: Аналитический обзор рынка..."]
+  S_004["📄 S-004: UX-аудит экранов онбордин..."]
+  S_005["📄 S-005: Векторная схема и UX-ауди..."]
+  F_001["🔍 F-001: Конверсия посетителей лен..."]
+  S_001 --> F_001
+  F_002["🔍 F-002: Конверсия активированных ..."]
+  S_002 --> F_002
+  F_003["🔍 F-003: Себестоимость GPU-инферен..."]
+  S_003 --> F_003
+  F_004["🔍 F-004: 77.2% пользователей покид..."]
+  S_004 --> F_004
+  F_005["🔍 F-005: M2 Retention у пользовате..."]
+  S_004 --> F_005
+  F_006["🔍 F-006: Средняя стоимость привлеч..."]
+  S_001 --> F_006
+  F_007["🔍 F-007: Композиция экрана 2 онбор..."]
+  S_005 --> F_007
+  C_001("📊 C-001:  %")
+  C_002("📊 C-002:  months")
+  C_003("📊 C-003:  ratio_multiplier")
+  O_001["🎯 O-001: Статус-кво: сохранение те"]
+  F_001 --> O_001
+  F_006 --> O_001
+  F_007 --> O_001
+  O_002["🎯 O-002: Закрытие отдельной B2C-по"]
+  F_001 --> O_002
+  F_006 --> O_002
+  F_007 --> O_002
+  O_003["🎯 O-003: Инвестиции в R&D потоково"]
+  F_003 --> O_003
+  C_001 --> O_003
+  O_004["🎯 O-004: Фокус на бесшовном семейн"]
+  F_004 --> O_004
+  F_005 --> O_004
+  C_002 --> O_004
+  C_003 --> O_004
+  F_007 --> O_004
+  classDef rec fill:#00B956,stroke:#008A40,stroke-width:2px,color:#fff;
+        </div>
+    </div>
+
+    <div class="grid">
+        <div class="box">
+            <h2>4. Сравнение альтернатив</h2>
+            
+        <div style="border: 1px solid #E2E8F0; border-radius: 8px; padding: 16px; margin-bottom: 12px; background: #fff;">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <h4 style="margin:0;">O-001: Статус-кво: сохранение текущей витрины, онбординга и тарифа 199 руб./мес.</h4>
+                
+            </div>
+            <p style="font-size:13px; color:#475569; margin:8px 0;">Продолжение закупки трафика на текущий лендинг без изменения воронки онбординга и технологического стека</p>
+            <div style="font-size:12px; color:#64748B;">
+                <b>Сильные возражения:</b> Высокий отвал 77.2% на 2-м шаге онбординга (F-004) консервирует низкую конверсию визитов 4.2%; Низкий M2 Retention одиночных пользователей 24.1% (F-005) делает CAC 485.7 руб. неокупаемым при ARPU 199 руб.
+            </div>
+        </div>
+        
+        <div style="border: 1px solid #E2E8F0; border-radius: 8px; padding: 16px; margin-bottom: 12px; background: #fff;">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <h4 style="margin:0;">O-002: Закрытие отдельной B2C-подписки и перевод базового спам-фильтра в тарифы</h4>
+                
+            </div>
+            <p style="font-size:13px; color:#475569; margin:8px 0;">Сворачивание отдельной коммерческой витрины «Семейный Щит» и интеграция базового антиспама как бесплатной опции в пакетные тарифы связи</p>
+            <div style="font-size:12px; color:#64748B;">
+                <b>Сильные возражения:</b> Прямая потеря выручки текущих 8026 платящих абонентов (~1.6 млн руб./мес. регулярного дохода); Утрата рыночного дифференциатора семейной защиты перед экосистемами Яндекса и Сбера
+            </div>
+        </div>
+        
+        <div style="border: 1px solid #E2E8F0; border-radius: 8px; padding: 16px; margin-bottom: 12px; background: #fff;">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <h4 style="margin:0;">O-003: Инвестиции в R&amp;D потокового ИИ-детектора голосовых дипфейков в реальном времени</h4>
+                
+            </div>
+            <p style="font-size:13px; color:#475569; margin:8px 0;">Разработка и внедрение нейросетевого потокового анализатора речи на сети МегаФона с детекцией синтезированного голоса</p>
+            <div style="font-size:12px; color:#64748B;">
+                <b>Сильные возражения:</b> Затраты на GPU-инференс 117-153 руб./мес. на абонента (F-003) обнуляют валовую маржу подписки до 12.1% (C-001); Ложные срабатывания 12-14% на реальной сети вызовут всплеск жалоб и ошибочных блокировок звонков близких; Пользователи опасаются прослушивания звонков нейросетями и ценят простоту тихой защиты
+            </div>
+        </div>
+        
+        <div style="border: 1px solid #E2E8F0; border-radius: 8px; padding: 16px; margin-bottom: 12px; background: #fff;">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <h4 style="margin:0;">O-004: Фокус на бесшовном семейном онбординге «Сначала своя защита -&gt; близкие в 1 клик на сети» без удорожания тарифа</h4>
+                
+            </div>
+            <p style="font-size:13px; color:#475569; margin:8px 0;">Редизайн онбординга с устранением блокирующего SMS-шага: мгновенная активация защиты на номере покупателя, затем подключение близких на уровне сети МегаФона в 1 клик из личного кабинета без сложных настроек на телефоне родителя, с семейным push/SMS-дайджестом</p>
+            <div style="font-size:12px; color:#64748B;">
+                <b>Сильные возражения:</b> Требует доработки интерфейсов личного кабинета и логики семейных связок на BSS (срок релиза 4-6 недель); Необходимость поддерживать сценарий, когда у родственника кнопочный телефон или номер другого оператора (ограниченный режим)
+            </div>
+        </div>
+        
+        </div>
+
+        <div class="box">
+            <h2>5. Рекомендованное решение (—)</h2>
+            <p><b>Продуктовое позиционирование:</b> —</p>
+            <p><b>Ключевое сообщение:</b> <i>«Для заботливых детей, которые хотят уберечь родителей от мошенников, МегаФон Семейный Щит — это тихая защита на уровне сети, которая включается в 1 клик без SMS-кодов и настроек на телефоне мамы, в отличие от бесплатных семейных чатов и приложений-определителей»</i></p>
+            <p><b>План проверки (90 дней):</b> Устранение блокирующего экрана онбординга снизит drop-off с 77.2% до 35-40%, доля семейных связок вырастет с 0.4 до 1.2 родственников на аккаунт, а удержание M2 вырастет с 29.5% до 55-60%</p>
+            <h3>Обязательства (Commitments):</h3>
+            <table>
+                <tr><th>ID</th><th>Владелец</th><th>Действие</th><th>Срок</th></tr>
+                <tr><td>K-001</td><td>Product Owner Onboarding</td><td>Реализовать редизайн 2-го экрана онбординга: активация на своем номере без блокирующего SMS близким</td><td>2026-12-05</td></tr><tr><td>K-002</td><td>BSS &amp; Network Architect</td><td>Настроить связку семейных номеров на уровне BSS МегаФона в 1 клик</td><td>2026-12-15</td></tr><tr><td>K-003</td><td>Lead Product Analyst</td><td>Запустить когортный мониторинг воронки онбординга и M2 Retention с еженедельным отчетом</td><td>2026-12-20</td></tr>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        mermaid.initialize({ startOnLoad: true, theme: 'neutral' });
+    </script>
+</body>
+</html>
