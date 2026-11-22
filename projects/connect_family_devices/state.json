@@ -2,7 +2,7 @@
   "case_id": "connect_family_devices",
   "schema_version": "1.0",
   "created_at": "2026-11-22T14:43:49+03:00",
-  "updated_at": "2026-11-22T14:50:12+03:00",
+  "updated_at": "2026-11-22T15:28:41+03:00",
   "problem_framing": {
     "raw_request": "Бриф «Связь для близких и собственных устройств» (вымышленный оператор): выбрать первых клиентов и проблему, предложить услугу, спланировать год и задать ориентир на 3-й год; решения руководителя — к концу 1-го и 2-го кварталов.",
     "clarified_problem": "Выбрать первую группу клиентов и проблему, предложить услугу, показать пользу и прибыль, составить план на год и ориентир на 3-й год; решения руководителя — конец 1-го и 2-го кварталов.",
@@ -97,32 +97,32 @@
       {
         "path": "evidence/evidence_graph.json",
         "sha256": "d92913e811b7353aea2ce5454c82b47c560038caf14b4ec1a68993f8a87e3c66",
-        "recorded_at": "2026-11-22T14:44:26+03:00"
+        "recorded_at": "2026-11-22T15:28:41+03:00"
       },
       {
         "path": "decisions/strategy_decision.json",
         "sha256": "2593eb72d4e50b95fe9e34679bf8716051e48ae29c3bd2a1ab7849748b8825f1",
-        "recorded_at": "2026-11-22T14:44:26+03:00"
+        "recorded_at": "2026-11-22T15:28:41+03:00"
       },
       {
         "path": "outputs/01_research_and_evidence.md",
         "sha256": "24b0f3096f7a5057872e4df152c6dba85c06a3d044145799d53b37839377988e",
-        "recorded_at": "2026-11-22T14:44:26+03:00"
+        "recorded_at": "2026-11-22T15:28:41+03:00"
       },
       {
         "path": "outputs/02_alternatives_comparison.md",
         "sha256": "acae06d194f05d461bc60b370e3f55213b31ee893d9975f0f4c6c9877ad54b2c",
-        "recorded_at": "2026-11-22T14:44:26+03:00"
+        "recorded_at": "2026-11-22T15:28:41+03:00"
       },
       {
         "path": "outputs/03_product_and_comm_strategy.md",
         "sha256": "fb64add932f0dfaca5dcfaea6dd6ca892e3eeac8b6f2aee12259ba2664071858",
-        "recorded_at": "2026-11-22T14:44:26+03:00"
+        "recorded_at": "2026-11-22T15:28:41+03:00"
       },
       {
         "path": "outputs/04_validation_plan_and_governance.md",
-        "sha256": "aa335a40a054a35106b9e035f1c530d41fb9baf25a5d298dbf9adc5dc35c2dc9",
-        "recorded_at": "2026-11-22T14:44:26+03:00"
+        "sha256": "1bdd9b087cdde913d942914377742bd10698d3a66f2fad0e7cb822498cd5889b",
+        "recorded_at": "2026-11-22T15:28:41+03:00"
       }
     ]
   },

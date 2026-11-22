@@ -3,7 +3,7 @@
 > [!NOTE]
 > Данный отчёт сформирован на базе учебного демонстрационного кейса (Synthetic Benchmark). Смоделированные данные (источники S-001, S-002, S-003) используются для соревновательного MVP и не отражают закрытые коммерческие данные компании.
 
-- **Текущий этап workflow:** `INDEPENDENT_REVIEW`
+- **Текущий этап workflow:** `HUMAN_DECISION`
 - **Статус решения:** `audited`
 - **Устаревшие узлы графа (`T08`):** `нет`
 
@@ -43,15 +43,17 @@
 - **R-005**: Отозван или обновлён источник брифа или таблицы показателей: все связанные выводы переоцениваются (отслеживаемые узлы: `S-001, S-002, S-003`, метрика: `—`, порог: `—`)
 
 ## 4.3. Журнал затрат и использования (`cost_and_usage_ledger` — `T11`)
-- **Суммарное время:** `6.8 сек`
-- **Суммарно токенов:** `84700`
+- **Суммарное время:** `1075.3 сек`
+- **Суммарно токенов:** `123700`
 - **Оценка стоимости:** `$0.000000`
 
-- `step-001-intake` [heavy] `problem-framing`: 0.1s, in=9000, out=1500, $0.0 (оценка)
-- `step-002-research-plan` [heavy] `problem-framing`: 0.7s, in=4000, out=1200, $0.0 (оценка)
-- `step-003-sources-findings` [light] `research-analyst`: 1.4s, in=14000, out=3500, $0.0 (оценка)
+- `step-001-intake` [heavy] `problem-framing`: 240.0s, in=9000, out=1500, $0.0 (оценка)
+- `step-002-research-plan` [heavy] `problem-framing`: 60.0s, in=4000, out=1200, $0.0 (оценка)
+- `step-003-sources-findings` [light] `research-analyst`: 150.0s, in=14000, out=3500, $0.0 (оценка)
 - `step-004-calculations` [none] `tools/strategist_cli.py`: 2.3s, in=0, out=0, $0.0 (точно)
-- `step-005-validation` [heavy] `source-and-data-analysis`: 2.0s, in=16000, out=4500, $0.0 (оценка)
-- `step-006-options-strategy` [heavy] `options-and-strategy`: 0.3s, in=22000, out=9000, $0.0 (оценка)
+- `step-005-validation` [heavy] `source-and-data-analysis`: 180.0s, in=16000, out=4500, $0.0 (оценка)
+- `step-006-options-strategy` [heavy] `options-and-strategy`: 240.0s, in=22000, out=9000, $0.0 (оценка)
+- `step-007-review` [none] `tools/schema_validator.py`: 3.0s, in=0, out=0, $0.0 (точно)
+- `step-008-five-part-document` [heavy] `options-and-strategy`: 200.0s, in=30000, out=9000, $0.0 (оценка)
 
-*Журнал содержит как прямые измерения (1 оп.), так и расчётные оценки (5 оп.).*
+*Журнал содержит как прямые измерения (2 оп.), так и расчётные оценки (6 оп.).*
